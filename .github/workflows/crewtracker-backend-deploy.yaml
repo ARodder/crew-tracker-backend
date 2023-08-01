@@ -13,6 +13,26 @@ env:
     DEPLOYMENT_MANIFEST_PATH: |
         manifests/deployment.yaml
         manifests/service.yaml
+    ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
+    AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+    AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+    AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+    AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+    AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+    AZURE_STORAGE_CONTAINER_NAME: ${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}
+    AZURE_STORAGE_ENDPOINT: ${{ secrets.AZURE_STORAGE_ENDPOINT }}
+    AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+    COUNTRY_CODE: ${{ secrets.COUNTRY_CODE }}
+    INCOME_MARGIN: ${{ secrets.INCOME_MARGIN}}
+    KEYCLOAK_BASE_URL: ${{ secrets.KEYCLOAK_BASE_URL }}
+    KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
+    KEYCLOAK_CLIENT_SECRET: ${{ secrets.KEYCLOAK_CLIENT_SECRET}}
+    KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
+    LOCATION_SEARCH_URL: ${{ secrets.LOCATION_SEARCH_URL }}
+    POSTGRESQL_DB_NAME: ${{ secrets.POSTGRESQL_DB_NAME }}
+    POSTGRESQL_DB_PASSWORD: ${{ secrets.POSTGRESQL_DB_PASSWORD }}
+    POSTGRESQL_DB_USER: ${{ secrets.POSTGRESQL_DB_USER }}
+    POSTGRESQL_HOSTNAME: ${{ secrets.POSTGRESQL_HOSTNAME }}
 jobs:
     buildImage:
         permissions:
@@ -63,23 +83,4 @@ jobs:
                 images: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ github.sha }}
                 manifests: ${{ env.DEPLOYMENT_MANIFEST_PATH }}
                 namespace: crewtracker-backend-service
-                ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
-                AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-                AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-                AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
-                AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
-                AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
-                AZURE_STORAGE_CONTAINER_NAME: ${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}
-                AZURE_STORAGE_ENDPOINT: ${{ secrets.AZURE_STORAGE_ENDPOINT }}
-                AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-                COUNTRY_CODE: ${{ secrets.COUNTRY_CODE }}
-                INCOME_MARGIN: ${{ secrets.INCOME_MARGIN}}
-                KEYCLOAK_BASE_URL: ${{ secrets.KEYCLOAK_BASE_URL }}
-                KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
-                KEYCLOAK_CLIENT_SECRET: ${{ secrets.KEYCLOAK_CLIENT_SECRET}}
-                KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
-                LOCATION_SEARCH_URL: ${{ secrets.LOCATION_SEARCH_URL }}
-                POSTGRESQL_DB_NAME: ${{ secrets.POSTGRESQL_DB_NAME }}
-                POSTGRESQL_DB_PASSWORD: ${{ secrets.POSTGRESQL_DB_PASSWORD }}
-                POSTGRESQL_DB_USER: ${{ secrets.POSTGRESQL_DB_USER }}
-                POSTGRESQL_HOSTNAME: ${{ secrets.POSTGRESQL_HOSTNAME }}
+
