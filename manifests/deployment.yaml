@@ -20,4 +20,12 @@ spec:
           image: acrworkflow1690924317472.azurecr.io/crewtracker-backend:latest
           ports:
             - containerPort: 8080
-
+          env:
+            - name: ALLOWED_ORIGINS
+              value: $ALLOWED_ORIGINS
+            - name: AZURE_CLIENT_ID
+              value: "$AZURE_CLIENT_ID"
+            - name: AZURE_CLIENT_SECRET
+              value: ${{AZURE_CLIENT_SECRET}}
+            - name: AZURE_STORAGE_ACCOUNT_KEY
+              value: "${{AZURE_STORAGE_ACCOUNT_KEY}}"
