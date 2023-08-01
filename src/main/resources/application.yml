@@ -1,0 +1,63 @@
+spring:
+  main:
+      allow-circular-references: true
+  jackson:
+    time-zone: Europe/Oslo
+  mail:
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: ${SMTP_ENABLE_START_TLS}
+  sql:
+    init:
+      mode: never
+  config:
+    import:
+    - optional:file:.env[.properties]
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_BASE_URL}realms/${KEYCLOAK_REALM}
+          jwk-set-uri: ${KEYCLOAK_BASE_URL}realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs
+  datasource:
+    url: jdbc:postgresql://${POSTGRESQL_HOSTNAME}:${POSTGRESQL_PORT}/${POSTGRESQL_DB_NAME}
+    username: ${POSTGRESQL_DB_USER}
+    password: ${POSTGRESQL_DB_PASSWORD}
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+  servlet:
+    multipart:
+      max-file-size: 200MB
+security:
+  allowed-origins: ${ALLOWED_ORIGINS}
+logging:
+  level:
+    root: info
+server:
+    port: 8080
+keycloak:
+  base-url: ${KEYCLOAK_BASE_URL}
+  realm: ${KEYCLOAK_REALM}
+  client-id: ${KEYCLOAK_CLIENT_ID}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET}
+location:
+  country-code: ${COUNTRY_CODE}
+  search:
+    url: ${LOCATION_SEARCH_URL}
+margin: ${INCOME_MARGIN}
+
+azure:
+  storage:
+    container:
+      name: ${AZURE_STORAGE_CONTAINER_NAME}
+    connection:
+      string: ${AZURE_STORAGE_CONNECTION_STRING}
