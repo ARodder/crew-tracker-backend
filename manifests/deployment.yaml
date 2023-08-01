@@ -22,42 +22,42 @@ spec:
             - containerPort: 8080
           env:
             - name: ALLOWED_ORIGINS
-              value: ${{ secrets.ALLOWED_ORIGINS }}
+              value: "${{ secrets.ALLOWED_ORIGINS }}"
             - name: AZURE_CLIENT_ID
-              value: ${{ secrets.AZURE_CLIENT_ID }}
+              value: "${{ secrets.AZURE_CLIENT_ID }}"
             - name: AZURE_CLIENT_SECRET
-              value: ${{ secrets.AZURE_CLIENT_SECRET }}
+              value: "${{ secrets.AZURE_CLIENT_SECRET }}"
             - name: AZURE_STORAGE_ACCOUNT_KEY
-              value: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+              value: "${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}"
             - name: AZURE_STORAGE_ACCOUNT_NAME
-              value: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+              value: "${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}"
             - name: AZURE_STORAGE_CONNECTION_STRING
-              value: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+              value: "${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}"
             - name: AZURE_STORAGE_CONTAINER_NAME
-              value: ${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}
+              value: "${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}"
             - name: AZURE_STORAGE_ENDPOINT
-              value: ${{ secrets.AZURE_STORAGE_ENDPOINT }}
+              value: "${{ secrets.AZURE_STORAGE_ENDPOINT }}"
             - name: AZURE_TENANT_ID
-              value: ${{ secrets.AZURE_TENANT_ID }}
+              value: "${{ secrets.AZURE_TENANT_ID }}"
             - name: COUNTRY_CODE
-              value: ${{ secrets.COUNTRY_CODE }}
+              value: "${{ secrets.COUNTRY_CODE }}"
             - name: INCOME_MARGIN
-              value: ${{ secrets.INCOME_MARGIN}}
+              value: "${{ secrets.INCOME_MARGIN}}"
             - name: KEYCLOAK_BASE_URL
-              value: ${{ secrets.KEYCLOAK_BASE_URL }}
+              value: "${{ secrets.KEYCLOAK_BASE_URL }}"
             - name: KEYCLOAK_CLIENT_ID
-              value: ${{ secrets.KEYCLOAK_CLIENT_ID }}
+              value: "${{ secrets.KEYCLOAK_CLIENT_ID }}"
             - name: KEYCLOAK_CLIENT_SECRET
-              value: ${{ secrets.KEYCLOAK_CLIENT_SECRET}}
+              value: "${{ secrets.KEYCLOAK_CLIENT_SECRET}}"
             - name: KEYCLOAK_REALM
-              value: ${{ secrets.KEYCLOAK_REALM }}
+              value: "${{ secrets.KEYCLOAK_REALM }}"
             - name: LOCATION_SEARCH_URL
-              value: ${{ secrets.LOCATION_SEARCH_URL }}
+              value: "${{ secrets.LOCATION_SEARCH_URL }}"
             - name: POSTGRESQL_DB_NAME
-              value: ${{ secrets.POSTGRESQL_DB_NAME }}
+              value: "${{ secrets.POSTGRESQL_DB_NAME }}"
             - name: POSTGRESQL_DB_PASSWORD
-              value: ${{ secrets.POSTGRESQL_DB_PASSWORD }}
+              value: "${{ secrets.POSTGRESQL_DB_PASSWORD }}"
             - name: POSTGRESQL_DB_USER
-              value: ${{ secrets.POSTGRESQL_DB_USER }}
+              value: "${{ secrets.POSTGRESQL_DB_USER }}"
             - name: POSTGRESQL_HOSTNAME
-              value: ${{ secrets.POSTGRESQL_HOSTNAME }}
+              value: "${{ secrets.POSTGRESQL_HOSTNAME }}"
