@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crewtracker-backend-deploy
+  labels:
+    app: crewtracker-backend-deploy
+  namespace: crewtracker-backend-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crewtracker-backend-deploy
+  template:
+    metadata:
+      labels:
+        app: crewtracker-backend-deploy
+    spec:
+      containers:
+        - name: crewtracker-backend-deploy
+          image: acrworkflow1690924317472.azurecr.io/crewtracker-backend:latest
+          ports:
+            - containerPort: 8080
