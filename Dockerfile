@@ -1,16 +1,12 @@
-FROM ubuntu:22.04
-WORKDIR /app
-COPY . .
-RUN apt-get update && apt install -y openjdk-17-jdk && apt install -y openjdk-17-jre
-RUN apt-get install -y maven
-RUN mvn clean package -DskipTests
+FROM maven:3-eclipse-temurin-17 as BUILD
 
-ARG JAR_FILE=/app/target/*.jar
-RUN mv ${JAR_FILE} /app/crew-tracker.jar
+COPY . /usr/src/app
+RUN mvn --batch-mode -f /usr/src/app/pom.xml clean package
 
-
+FROM eclipse-temurin:17-jre
+ENV PORT 8080
 EXPOSE 8080
+COPY --from=BUILD /usr/src/app/target /opt/target
+WORKDIR /opt/target
 
-CMD ["java", "-jar", "crew-tracker.jar"]
-
-
+CMD ["/bin/bash", "-c", "find -type f -name '*-SNAPSHOT.jar' | xargs java -jar"]
