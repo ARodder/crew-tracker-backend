@@ -22,9 +22,9 @@ spec:
             - containerPort: 8080
           env:
             - name: ALLOWED_ORIGINS
-              value: "$(ALLOWED_ORIGINS)"
+              value: ${{secrets.ALLOWED_ORIGINS}}
             - name: AZURE_CLIENT_ID
-              value: "$AZURE_CLIENT_ID"
+              value: "${{secrets.AZURE_CLIENT_ID}}"
             - name: AZURE_CLIENT_SECRET
               value: ${{AZURE_CLIENT_SECRET}}
             - name: AZURE_STORAGE_ACCOUNT_KEY
