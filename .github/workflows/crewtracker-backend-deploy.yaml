@@ -59,10 +59,10 @@ jobs:
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "default"
+                namespace: "crewtracker-backend-service"
                 secret-type: "generic"
                 secret-name: "smtp-host"
-                data: '{"smtp-host": "${{ secrets.SMTP_HOST }}"}'
+                data: ${{ secrets.SMTP_HOST }}
             - uses: Azure/k8s-deploy@v4
               name: Deploys application
               env:

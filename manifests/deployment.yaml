@@ -32,5 +32,5 @@ spec:
             - name: SMTP_HOST
               valueFrom:
                 secretKeyRef:
-                  name: default
+                  name: smtp-host
                   key: smtp-host
