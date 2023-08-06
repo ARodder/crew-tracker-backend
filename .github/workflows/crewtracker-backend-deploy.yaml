@@ -62,7 +62,7 @@ jobs:
                 namespace: "default"
                 secret-type: "generic"
                 secret-name: "smtp-host"
-                data: ${{ secrets.SMTP_HOST }}
+                data: "gmail.com"
             - uses: Azure/k8s-deploy@v4
               name: Deploys application
               env:
