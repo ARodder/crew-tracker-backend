@@ -62,7 +62,7 @@ jobs:
                 namespace: "crewtracker-backend-service"
                 secret-type: "generic"
                 secret-name: "smtp-host"
-                data: '{"smtp-host": "${{ secrets.SMTP_HOST }}"}'
+                string-data: '{"smtp-host": "${{ secrets.SMTP_HOST }}"}'
             - uses: Azure/k8s-deploy@v4
               name: Deploys application
               env:
