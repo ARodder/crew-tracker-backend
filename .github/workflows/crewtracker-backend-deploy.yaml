@@ -237,7 +237,7 @@ jobs:
                 namespace: "crewtracker-backend-service"
                 secret-type: "generic"
                 secret-name: "postgresql-port"
-                string-data: '{"postgresql-hostname": "${{ secrets.POSTGRESQL_PORT }}"}'
+                string-data: '{"postgresql-port": "${{ secrets.POSTGRESQL_PORT }}"}'
             - uses: Azure/k8s-deploy@v4
               name: Deploys application
               with:
