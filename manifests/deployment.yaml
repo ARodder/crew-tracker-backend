@@ -146,3 +146,8 @@ spec:
                 secretKeyRef:
                   name: postgresql-hostname
                   key: postgresql-hostname
+            - name: POSTGRESQL_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-port
+                  key: postgresql-port

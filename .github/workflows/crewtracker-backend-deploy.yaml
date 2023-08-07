@@ -231,6 +231,13 @@ jobs:
                 secret-type: "generic"
                 secret-name: "postgresql-hostname"
                 string-data: '{"postgresql-hostname": "${{ secrets.POSTGRESQL_HOSTNAME }}"}'
+            - uses: azure/k8s-create-secret@v4
+              name: Create secrets
+              with:
+                namespace: "crewtracker-backend-service"
+                secret-type: "generic"
+                secret-name: "postgresql-port"
+                string-data: '{"postgresql-hostname": "${{ secrets.POSTGRESQL_PORT }}"}'
             - uses: Azure/k8s-deploy@v4
               name: Deploys application
               with:
