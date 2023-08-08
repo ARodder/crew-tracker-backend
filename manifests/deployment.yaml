@@ -151,3 +151,8 @@ spec:
                 secretKeyRef:
                   name: postgresql-port
                   key: postgresql-port
+            - name: KEY_STORE
+              valueFrom:
+                secretKeyRef:
+                  name: crewtracker-backend-tls
+                  key: crewtracker-backend-tls
