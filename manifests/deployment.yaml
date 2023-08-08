@@ -4,9 +4,9 @@ metadata:
   name: crewtracker-backend-deploy
   labels:
     app: crewtracker-backend-deploy
-  namespace: crewtracker-backend-service
+  namespace: crewtracker-backend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: crewtracker-backend-deploy
@@ -151,8 +151,4 @@ spec:
                 secretKeyRef:
                   name: postgresql-port
                   key: postgresql-port
-            - name: KEY_STORE
-              valueFrom:
-                secretKeyRef:
-                  name: crewtracker-backend-tls
-                  key: crewtracker-backend-tls
+

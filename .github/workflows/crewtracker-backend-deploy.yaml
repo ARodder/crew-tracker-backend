@@ -5,11 +5,12 @@ name: crewtracker-backend-deploy
             - trunk
     workflow_dispatch: {}
 env:
-    ACR_RESOURCE_GROUP: CrewTrackerTest
+    ACR_RESOURCE_GROUP: MC_CrewTrackerTest_CrewTracker_norwayeast
     AZURE_CONTAINER_REGISTRY: acrworkflow1690924317472
     CLUSTER_NAME: CrewTracker
     CLUSTER_RESOURCE_GROUP: CrewTrackerTest
     CONTAINER_NAME: crewtracker-backend
+    CLUSTER_NAMESPACE: crewtracker-backend
     DEPLOYMENT_MANIFEST_PATH: |
         manifests/deployment.yaml
         manifests/service.yaml
@@ -59,182 +60,182 @@ jobs:
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "smtp-host"
                 string-data: '{"smtp-host": "${{ secrets.SMTP_HOST }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "smtp-password"
                 string-data: '{"smtp-password": "${{ secrets.SMTP_PASSWORD }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "smtp-port"
                 string-data: '{"smtp-port": "${{ secrets.SMTP_PORT }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "smtp-username"
                 string-data: '{"smtp-username": "${{ secrets.SMTP_USERNAME }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "smtp-enable-start-tls"
                 string-data: '{"smtp-enable-start-tls": "${{ secrets.SMTP_ENABLE_START_TLS }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "allowed-origins"
                 string-data: '{"allowed-origins": "${{ secrets.ALLOWED_ORIGINS }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "azure-client-id"
                 string-data: '{"azure-client-id": "${{ secrets.AZURE_CLIENT_ID }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "azure-client-secret"
                 string-data: '{"azure-client-secret": "${{ secrets.AZURE_CLIENT_SECRET }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "azure-storage-account-key"
                 string-data: '{"azure-storage-account-key": "${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "azure-storage-account-name"
                 string-data: '{"azure-storage-account-name": "${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "azure-storage-connection-string"
                 string-data: '{"azure-storage-connection-string": "${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "azure-storage-container-name"
                 string-data: '{"azure-storage-container-name": "${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "azure-storage-endpoint"
                 string-data: '{"azure-storage-endpoint": "${{ secrets.AZURE_STORAGE_ENDPOINT }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "azure-tenant-id"
                 string-data: '{"azure-tenant-id": "${{ secrets.AZURE_TENANT_ID }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "country-code"
                 string-data: '{"country-code": "${{ secrets.COUNTRY_CODE }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "income-margin"
                 string-data: '{"income-margin": "${{ secrets.INCOME_MARGIN }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "keycloak-base-url"
                 string-data: '{"keycloak-base-url": "${{ secrets.KEYCLOAK_BASE_URL }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "keycloak-client-id"
                 string-data: '{"keycloak-client-id": "${{ secrets.KEYCLOAK_CLIENT_ID }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "keycloak-client-secret"
                 string-data: '{"keycloak-client-secret": "${{ secrets.KEYCLOAK_CLIENT_SECRET }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "keycloak-realm"
                 string-data: '{"keycloak-realm": "${{ secrets.KEYCLOAK_REALM }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "location-search-url"
                 string-data: '{"location-search-url": "${{ secrets.LOCATION_SEARCH_URL }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "postgresql-db-name"
                 string-data: '{"postgresql-db-name": "${{ secrets.POSTGRESQL_DB_NAME }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "postgresql-db-password"
                 string-data: '{"postgresql-db-password": "${{ secrets.POSTGRESQL_DB_PASSWORD }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "postgresql-db-user"
                 string-data: '{"postgresql-db-user": "${{ secrets.POSTGRESQL_DB_USER }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "postgresql-hostname"
                 string-data: '{"postgresql-hostname": "${{ secrets.POSTGRESQL_HOSTNAME }}"}'
             - uses: azure/k8s-create-secret@v4
               name: Create secrets
               with:
-                namespace: "crewtracker-backend-service"
+                namespace: ${{ env.CLUSTER_NAMESPACE }}
                 secret-type: "generic"
                 secret-name: "postgresql-port"
                 string-data: '{"postgresql-port": "${{ secrets.POSTGRESQL_PORT }}"}'
@@ -244,8 +245,4 @@ jobs:
                 action: deploy
                 images: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ github.sha }}
                 manifests: ${{ env.DEPLOYMENT_MANIFEST_PATH }}
-                namespace: crewtracker-backend-service
-
-            
-                
-
+                namespace: crewtracker-backend

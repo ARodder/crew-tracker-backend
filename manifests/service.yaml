@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: crewtracker-backend-deploy
-  namespace: crewtracker-backend-service
+  namespace: crewtracker-backend
 spec:
   selector:
     app: crewtracker-backend-deploy
