@@ -10,7 +10,7 @@ env:
     CLUSTER_NAME: CrewTracker
     CLUSTER_RESOURCE_GROUP: CrewTrackerTest
     CONTAINER_NAME: crewtracker-backend
-    CLUSTER_NAMESPACE: crewtracker-backend
+    CLUSTER_NAMESPACE: crewtracker
     DEPLOYMENT_MANIFEST_PATH: |
         manifests/deployment.yaml
         manifests/service.yaml
