@@ -4,9 +4,9 @@ metadata:
   name: crewtracker-backend-deploy
   labels:
     app: crewtracker-backend-deploy
-  namespace: crewtracker-backend
+  namespace: crewtracker
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: crewtracker-backend-deploy
