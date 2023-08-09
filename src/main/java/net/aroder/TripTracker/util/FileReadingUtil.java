@@ -192,18 +192,23 @@ public class FileReadingUtil {
                     //TODO: What to do if the organizerCompany is wrong.
                     if (tempShip.getOrganizerCompany().equals(organizerCompany)) {
                         this.ship = tempShip;
+                        break;
                     }
-
-
                 } else {
                     if (extractedShipName.equalsIgnoreCase("ships name"))
                         throw new InvalidNameException("Missing name of the ship");
                     this.ship = new Ship(extractedShipName);
                     ship.setOrganizerCompany(organizerCompany);
                     shipRepository.save(ship);
+                    break;
                 }
 
-            } else if (cellStringValue.toLowerCase().contains("harbour") || cellStringValue.toLowerCase().contains("havn")|| cellStringValue.toLowerCase().contains("port")) {
+            }
+        }
+        for (Cell cell : sheet.getRow(1)){
+            if (cell.getCellType() != CellType.STRING) continue;
+            String cellStringValue = cell.getStringCellValue();
+            if (cellStringValue.toLowerCase().contains("harbour") || cellStringValue.toLowerCase().contains("havn") || cellStringValue.toLowerCase().contains("port")) {
                 Cell neighbouringCell = sheet.getRow(0).getCell(cell.getColumnIndex() + 1);
                 if (neighbouringCell.getCellType() == CellType.STRING) {
                     this.harbour = locationService.determineLocation(neighbouringCell.getStringCellValue());
