@@ -209,7 +209,7 @@ public class FileReadingUtil {
             if (cell.getCellType() != CellType.STRING) continue;
             String cellStringValue = cell.getStringCellValue();
             if (cellStringValue.toLowerCase().contains("harbour") || cellStringValue.toLowerCase().contains("havn") || cellStringValue.toLowerCase().contains("port")) {
-                Cell neighbouringCell = sheet.getRow(0).getCell(cell.getColumnIndex() + 1);
+                Cell neighbouringCell = cell.getRow().getCell(cell.getColumnIndex() + 1);
                 if (neighbouringCell.getCellType() == CellType.STRING) {
                     this.harbour = locationService.determineLocation(neighbouringCell.getStringCellValue());
                 }
