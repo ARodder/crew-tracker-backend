@@ -41,7 +41,7 @@ security:
   allowed-origins: ${ALLOWED_ORIGINS}
 logging:
   level:
-    root: info
+    root: debug
 server:
     port: 8080
 keycloak:
