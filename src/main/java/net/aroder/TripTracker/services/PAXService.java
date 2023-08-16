@@ -54,7 +54,7 @@ public class PAXService {
      * @return true if a matching passenger exists and is not canceled, false otherwise.
      */
     public boolean checkPassengerByLocationsExist(PAX pax) {
-        Optional<PAX> foundPax = paxRepository.findByFirstNameAndSurnameAndPickUpLocationAndDestinationAndPickUpTimeAfter(pax.getFirstName(), pax.getSurname(), pax.getPickUpLocation(),pax.getDestination(),new Timestamp(System.currentTimeMillis()));
+        Optional<PAX> foundPax = paxRepository.findByFirstNameAndSurnameAndPickUpLocationAndDestination(pax.getFirstName(), pax.getSurname(), pax.getPickUpLocation(),pax.getDestination());
         return foundPax.isPresent() && !foundPax.get().getStatus().equals("cancel");
     }
 
@@ -136,8 +136,8 @@ public class PAXService {
         //TODO: Might need to add time limitation, to only change pax within the same day
         //when changing time
         for(PAX pax : paxList){
-            Optional<PAX> passengerByTime = paxRepository.findByFirstNameAndSurnameAndPickUpTimeAndPickUpTimeAfter(pax.getFirstName(),pax.getSurname(),pax.getPickUpTime(),new Timestamp(new Date().getTime()));
-            Optional<PAX> passengerByLocations = paxRepository.findByFirstNameAndSurnameAndPickUpLocationAndDestinationAndPickUpTimeAfter(pax.getFirstName(),pax.getSurname(),pax.getPickUpLocation(),pax.getDestination(),new Timestamp(new Date().getTime()));
+            Optional<PAX> passengerByTime = paxRepository.findByFirstNameAndSurnameAndPickUpTime(pax.getFirstName(),pax.getSurname(),pax.getPickUpTime());
+            Optional<PAX> passengerByLocations = paxRepository.findByFirstNameAndSurnameAndPickUpLocationAndDestination(pax.getFirstName(),pax.getSurname(),pax.getPickUpLocation(),pax.getDestination());
 
             passengerByTime.ifPresent(value -> changePaxByTime(pax, value));
             passengerByLocations.ifPresent(value -> changePaxByLocations(pax,value));

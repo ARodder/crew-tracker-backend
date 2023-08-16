@@ -309,7 +309,7 @@ public class FileReadingUtil {
             }
 
         } catch (Exception e) {
-            pax.setError("Error in immigration");
+            logger.info("could not read immigration");
         }
         try {
             pax.setOrganization(row.getCell(organizationIndex).getStringCellValue());

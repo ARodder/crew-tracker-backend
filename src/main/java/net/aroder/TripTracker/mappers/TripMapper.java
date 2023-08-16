@@ -3,6 +3,7 @@ package net.aroder.TripTracker.mappers;
 import net.aroder.TripTracker.models.*;
 import net.aroder.TripTracker.models.DTOs.PaxDTOs.PaxDTO;
 import net.aroder.TripTracker.models.DTOs.ShipDTOs.ShipDTO;
+import net.aroder.TripTracker.models.DTOs.TripDTOs.TripAdminDTO;
 import net.aroder.TripTracker.models.DTOs.TripDTOs.TripDTO;
 import net.aroder.TripTracker.models.DTOs.TripDTOs.TripDispatchDTO;
 import net.aroder.TripTracker.models.DTOs.TripDTOs.TripOrganizeDTO;
@@ -62,6 +63,15 @@ public abstract class TripMapper {
     @Mapping(source = "ship",target="ship",qualifiedByName = "shipToShipDto")
     @Mapping(source = "externalPrice",target="price")
     public abstract TripOrganizeDTO toTripDTOOrganize(Trip trip);
+
+    @Mapping(source = "driver",target="driver",qualifiedByName = "driverToDriverDto")
+    @Mapping(source = "passengers",target="passengers",qualifiedByName = "paxToPaxDto")
+    @Mapping(source = "region",target="regionId",qualifiedByName = "regionToRegionId")
+    @Mapping(source = "organizerCompany",target="organizerCompanyId",qualifiedByName = "organizerCompanyToOrganizerCompanyId")
+    @Mapping(source = "ship",target="ship",qualifiedByName = "shipToShipDto")
+    @Mapping(source = "externalPrice",target="externalPrice")
+    @Mapping(source = "subContractorPrice",target="subContractorPrice")
+    public abstract TripAdminDTO toTripDTOAdmin(Trip trip);
 
     public List<Trip> toTripById(List<Long> tripIds){
         return tripIds.stream().map(tripId -> tripService.findTripById(tripId)).toList();

@@ -125,7 +125,6 @@ public class TripService {
                             && pax.getPickUpLocation().equalsIgnoreCase(trip.getPickUpLocation().getName())
                             && pax.getPickUpTime().compareTo(trip.getPickUpTime()) == 0).toList();
 
-
             passenger.setTrip(trip);
             paxRepository.save(passenger);
 
@@ -140,13 +139,17 @@ public class TripService {
         }
     }
 
+    public Trip getTrip(Long id) {
+        return tripRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Trip not found"));
+    }
+
     public Trip findOrCreateTrip(PAX passenger, OrganizerCompany organizerCompany) {
         return tripRepository.findCompatibleTrip(
                 passenger.getShip(),
                 passenger.getPoNumber(),
                 passenger.getHarbour(),
-                locationService.determineLocation(passenger.getPickUpLocation()),
                 locationService.determineLocation(passenger.getDestination()),
+                locationService.determineLocation(passenger.getPickUpLocation()),
                 passenger.getPickUpTime(),
                 organizerCompany
         ).orElse(createTripFromPax(passenger, organizerCompany));

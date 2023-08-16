@@ -63,6 +63,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
             "WHERE t.poNumber = :poNumber " +
             "AND (:organizerCompany IS NULL OR t.organizerCompany = :organizerCompany) " +
             "AND (:regionIds IS NULL OR t.region.id IN :regionIds) " +
+            "AND t.status != 'cancelled' " +
             "ORDER BY t.pickUpTime ASC")
     List<Trip> findTripsForExport(
             @Param("poNumber") Long poNumber,

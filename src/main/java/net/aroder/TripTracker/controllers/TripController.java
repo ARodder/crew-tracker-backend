@@ -70,6 +70,21 @@ public class TripController {
         }
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity getTrip(@PathVariable("id") Long id) {
+        try {
+            Trip foundTrip = tripService.getTrip(id);
+            return ResponseEntity.ok(tripMapper.toTripDTOAdmin(foundTrip));
+        } catch (EntityNotFoundException e) {
+            logger.error("Error getting trip: ", e);
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            logger.error("Error getting trip: ", e);
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @PostMapping("/page")
     @Operation(summary = "Retrieves a paginated list of trips based on search")
     @ApiResponses(value = {
