@@ -47,6 +47,7 @@ public class TripService {
     private final String ORGANIZER_ROLE_KEY = "ROLE_ORGANIZER";
     private final String DISPATCHER_ROLE_KEY = "ROLE_DISPATCHER";
     private final List<String> tripStages = List.of("created", "assigned", "in_progress", "completed", "cancelled");
+
     private static final Logger logger = LoggerFactory.getLogger(TripService.class);
 
     @Value("${margin}")
@@ -531,5 +532,14 @@ public class TripService {
         tripsFile.delete();
 
         return fdo;
+    }
+
+    public void deleteTrip(Long tripId) throws EntityNotFoundException {
+        Trip foundTrip = tripRepository.findById(tripId).orElseThrow(()->new EntityNotFoundException("Could not find trip"));
+        foundTrip.getPassengers().forEach(passenger -> {
+            passenger.setTrip(null);
+            paxRepository.delete(passenger);
+        });
+        tripRepository.delete(foundTrip);
     }
 }
