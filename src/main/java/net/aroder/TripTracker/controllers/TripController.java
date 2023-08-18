@@ -430,4 +430,19 @@ public class TripController {
         }
     }
 
+    @DeleteMapping("/{tripId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity deleteTrip(@PathVariable("tripId") Long tripId){
+        try{
+            tripService.deleteTrip(tripId);
+            return ResponseEntity.accepted().build();
+        }catch (EntityNotFoundException e){
+            logger.error("Failed to delete trip: ", e);
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }catch (Exception e){
+            logger.error("Failed to delete trip: ", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
 }
