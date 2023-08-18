@@ -156,9 +156,9 @@ public class PAXService {
             oldPax.setPickUpTime(newPax.getPickUpTime());
 
             oldPax = tripService.determineNewTrip(oldTrip,oldPax);
-
-            tripRepository.delete(oldTrip);
             paxRepository.save(oldPax);
+            tripRepository.delete(oldTrip);
+
         } else {
             oldPax.setPickUpTime(newPax.getPickUpTime());
             oldPax = tripService.determineNewTrip(oldTrip,oldPax);
@@ -179,8 +179,9 @@ public class PAXService {
             oldPax.setPickUpLocation(newPax.getPickUpLocation());
 
             oldPax = tripService.determineNewTrip(oldTrip,oldPax);
-            tripRepository.delete(oldTrip);
             paxRepository.save(oldPax);
+            tripRepository.delete(oldTrip);
+
         }else{
             oldPax.setDestination(newPax.getDestination());
             oldPax.setPickUpLocation(newPax.getPickUpLocation());
