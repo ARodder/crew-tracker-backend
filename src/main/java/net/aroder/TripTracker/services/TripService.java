@@ -158,12 +158,13 @@ public class TripService {
 
     public PAX determineNewTrip(Trip oldTrip, PAX pax) {
         Optional<Trip> matchingTrip = tripRepository
-                .findByOrganizerCompanyAndShipAndPickUpTimeAndDestinationAndPickUpLocation(
+                .findByOrganizerCompanyAndShipAndPickUpTimeAndDestinationAndPickUpLocationAndPoNumber(
                         oldTrip.getOrganizerCompany(),
                         pax.getShip(),
                         pax.getPickUpTime(),
                         locationService.determineLocation(pax.getDestination()),
-                        locationService.determineLocation(pax.getPickUpLocation()));
+                        locationService.determineLocation(pax.getPickUpLocation()),
+                        pax.getPoNumber());
         if (matchingTrip.isPresent()) {
             pax.setTrip(matchingTrip.get());
             return pax;

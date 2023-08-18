@@ -57,7 +57,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
      * @param pickUpLocation   pickup location for the trip.
      * @return An optional containing the trip or not.
      */
-    Optional<Trip> findByOrganizerCompanyAndShipAndPickUpTimeAndDestinationAndPickUpLocation(OrganizerCompany organizerCompany, Ship ship, Timestamp pickUpTime, Location destination, Location pickUpLocation);
+    Optional<Trip> findByOrganizerCompanyAndShipAndPickUpTimeAndDestinationAndPickUpLocationAndPoNumber(OrganizerCompany organizerCompany, Ship ship, Timestamp pickUpTime, Location destination, Location pickUpLocation,Long poNumber);
 
     @Query("SELECT t FROM Trip t " +
             "WHERE t.poNumber = :poNumber " +
