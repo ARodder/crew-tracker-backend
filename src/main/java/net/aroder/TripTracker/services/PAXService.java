@@ -151,15 +151,17 @@ public class PAXService {
      * @param oldPax old pax details
      */
     private void changePaxByLocations(PAX newPax, PAX oldPax){
-        Trip passengerTrip = oldPax.getTrip();
-        if(passengerTrip.getPassengers().size() == 1){
+        Trip oldTrip = oldPax.getTrip();
+        if(oldTrip.getPassengers().size() == 1){
             oldPax.setPickUpTime(newPax.getPickUpTime());
-            passengerTrip.setPickUpTime(newPax.getPickUpTime());
-            tripRepository.save(passengerTrip);
+
+            oldPax = tripService.determineNewTrip(oldTrip,oldPax);
+
+            tripRepository.delete(oldTrip);
             paxRepository.save(oldPax);
         } else {
             oldPax.setPickUpTime(newPax.getPickUpTime());
-            oldPax = tripService.determineNewTrip(oldPax.getTrip(),oldPax);
+            oldPax = tripService.determineNewTrip(oldTrip,oldPax);
             paxRepository.save(oldPax);
         }
     }
@@ -171,19 +173,18 @@ public class PAXService {
      * @param oldPax old pax details
      */
     private void changePaxByTime(PAX newPax, PAX oldPax) {
-        Trip passengerTrip = oldPax.getTrip();
-        if(passengerTrip.getPassengers().size() == 1){
+        Trip oldTrip = oldPax.getTrip();
+        if(oldTrip.getPassengers().size() == 1){
             oldPax.setDestination(newPax.getDestination());
             oldPax.setPickUpLocation(newPax.getPickUpLocation());
 
-            passengerTrip.setDestination(locationService.determineLocation(newPax.getDestination()));
-            passengerTrip.setPickUpLocation(locationService.determineLocation(newPax.getPickUpLocation()));
-            tripRepository.save(passengerTrip);
+            oldPax = tripService.determineNewTrip(oldTrip,oldPax);
+            tripRepository.delete(oldTrip);
             paxRepository.save(oldPax);
         }else{
             oldPax.setDestination(newPax.getDestination());
             oldPax.setPickUpLocation(newPax.getPickUpLocation());
-            oldPax = tripService.determineNewTrip(oldPax.getTrip(),oldPax);
+            oldPax = tripService.determineNewTrip(oldTrip,oldPax);
             paxRepository.save(oldPax);
         }
     }
