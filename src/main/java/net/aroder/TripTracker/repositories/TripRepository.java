@@ -81,7 +81,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
             "WHERE (:ship is null or t.ship = :ship) " +
             "AND (:poNumber is null or t.poNumber = :poNumber) " +
             "AND (:harbour is null or t.harbour = :harbour) " +
-            "AND (:status is null or t.status != :status) " +
+            "AND ((:hideCanceledTrips  = false) OR (:hideCanceledTrips = true AND t.status != 'canceled')) " +
             "AND (:organizerCompany is null or t.organizerCompany = :organizerCompany) " +
             "AND (:region is null or t.region.id in :region) " +
             "AND (cast(:startDate as date) is null or t.pickUpTime > :startDate) " +
@@ -92,7 +92,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     List<Trip> searchTripsPage(@Param("ship") Ship ship,
                                @Param("poNumber") Long poNumber,
                                @Param("harbour") Location harbour,
-                               @Param("status") String status,
+                               @Param("hideCanceledTrips") boolean hideCanceledTrips,
                                @Param("startDate") Timestamp startDate,
                                @Param("endDate") Timestamp endDate,
                                @Param("organizerCompany") OrganizerCompany organizerCompany,
@@ -105,7 +105,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
             "WHERE (:ship is null or t.ship = :ship) " +
             "AND (:poNumber is null or t.poNumber = :poNumber) " +
             "AND (:harbour is null or t.harbour = :harbour) " +
-            "AND (:status is null or t.status != :status) " +
+            "AND ((:hideCanceledTrips  = false) OR (:hideCanceledTrips = true AND t.status != 'canceled')) " +
             "AND (:organizerCompany is null or t.organizerCompany = :organizerCompany) " +
             "AND (:region is null or t.region.id in :region) " +
             "AND (cast(:startDate as date) is null or t.pickUpTime > :startDate) " +
@@ -116,7 +116,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     List<Trip> searchTripsPageArchive(@Param("ship") Ship ship,
                                       @Param("poNumber") Long poNumber,
                                       @Param("harbour") Location harbour,
-                                      @Param("status") String status,
+                                      @Param("hideCanceledTrips") boolean hideCanceledTrips,
                                       @Param("startDate") Timestamp startDate,
                                       @Param("endDate") Timestamp endDate,
                                       @Param("organizerCompany") OrganizerCompany organizerCompany,
@@ -130,7 +130,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
             "WHERE (:ship is null or t.ship = :ship) " +
             "AND (:poNumber is null or t.poNumber = :poNumber) " +
             "AND (:harbour is null or t.harbour = :harbour) " +
-            "AND (:status is null or (t.status != 'cancel' AND t.status != 'completed')) " +
+            "AND (:status is null or (t.status != 'canceled' AND t.status != 'completed')) " +
             "AND (:organizerCompany is null or t.organizerCompany = :organizerCompany) " +
             "AND (cast(:today as date) is null or t.pickUpTime > :today) " +
             "ORDER BY t.pickUpTime ")
@@ -165,7 +165,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     @Query("SELECT t FROM Trip t " +
             "WHERE (t.region.id IN :regions) " +
             "AND ((:hideAssignedTrips = true AND t.driver is null) OR (:hideAssignedTrips = false)) " +
-            "AND ((:hideCanceledTrips = true AND t.status != 'cancel') OR (:hideCanceledTrips = false)) " +
+            "AND ((:hideCanceledTrips = true AND t.status != 'canceled') OR (:hideCanceledTrips = false)) " +
             "AND ((:hidePricedTrips = true AND (t.subContractorPrice = null AND t.externalPrice = null)) OR (:hidePricedTrips = false)) " +
             "AND ((:today is null) OR (:showPastTrips = true AND t.pickUpTime < :today) OR (:showPastTrips = false AND t.pickUpTime > :today)) " +
             "AND (:poNumber is null OR t.poNumber = :poNumber) " +
@@ -184,7 +184,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
 
     @Query("SELECT t FROM Trip t " +
             "WHERE ((:hideAssignedTrips = true AND t.driver is null) OR (:hideAssignedTrips = false)) " +
-            "AND ((:hideCanceledTrips = true AND t.status != 'cancel') OR (:hideCanceledTrips = false)) " +
+            "AND ((:hideCanceledTrips = true AND t.status != 'canceled') OR (:hideCanceledTrips = false)) " +
             "AND ((:showPastTrips = true AND t.pickUpTime < :today) OR (:showPastTrips = false AND t.pickUpTime > :today)) " +
             "AND ((:hidePricedTrips = true AND (t.subContractorPrice = null AND t.externalPrice = null)) OR (:hidePricedTrips = false)) " +
             "AND (:poNumber is null OR t.poNumber = :poNumber) " +
