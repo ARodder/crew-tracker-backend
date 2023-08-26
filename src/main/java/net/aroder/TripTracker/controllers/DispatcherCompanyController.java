@@ -16,7 +16,7 @@ import java.net.URI;
 @RequestMapping("/api/v1/dispatcher-companies")
 public class DispatcherCompanyController {
 
-    private Logger logger = LoggerFactory.getLogger(DispatcherCompanyController.class);
+    private final Logger logger = LoggerFactory.getLogger(DispatcherCompanyController.class);
     @Autowired
     private DispatcherCompanyService dispatcherCompanyService;
     @Autowired

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "/api/v1/passengers")
 public class PAXController {
 
-    private Logger logger = LoggerFactory.getLogger(PAXController.class);
+    private final Logger logger = LoggerFactory.getLogger(PAXController.class);
     @Autowired
     private PAXService paxService;
     @Autowired

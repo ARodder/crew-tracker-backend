@@ -16,7 +16,7 @@ import java.sql.Timestamp;
 @EnableScheduling
 public class SchedulingConfig {
 
-    private Logger logger = LoggerFactory.getLogger(SchedulingConfig.class);
+    private final Logger logger = LoggerFactory.getLogger(SchedulingConfig.class);
 
     @Autowired
     private PAXRepository paxRepository;

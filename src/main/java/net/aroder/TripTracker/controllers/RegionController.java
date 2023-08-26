@@ -18,7 +18,7 @@ import java.net.URI;
 @RequestMapping("/api/v1/regions")
 public class RegionController {
 
-    private Logger logger = LoggerFactory.getLogger(RegionController.class);
+    private final Logger logger = LoggerFactory.getLogger(RegionController.class);
 
     @Autowired
     private RegionService regionService;

@@ -4,36 +4,18 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import net.aroder.TripTracker.models.DomainFile;
-import net.aroder.TripTracker.models.PAX;
 import net.aroder.TripTracker.repositories.DomainFileRepository;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.WritableResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.Files;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import net.aroder.TripTracker.config.FileStorageProperties;
 import net.aroder.TripTracker.exceptions.FileStorageException;
-import net.aroder.TripTracker.exceptions.MyFileNotFoundException;
 import org.springframework.util.StringUtils;
-
-import java.nio.file.StandardCopyOption;
-
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-
-import java.net.MalformedURLException;
 import java.sql.Timestamp;
-import java.util.List;
 
 /**
  * The FileStorageService handles the saving of uploaded files
@@ -79,10 +61,10 @@ public class FileStorageService {
 
 
 
-    public DomainFile storeMultipartFile(MultipartFile file,Long poNumber,String newFileName,String type) throws IllegalAccessException {
+    public DomainFile storeMultipartFile(MultipartFile file,Long poNumber,String fileName,String type) throws IllegalAccessException {
         // Normalize file name
         String targetLocation = determineDirectory(type);
-        String fileName = (newFileName != null ? newFileName : StringUtils.cleanPath(file.getOriginalFilename()));
+
 
         try {
             // Check if the file's name contains invalid characters
@@ -135,12 +117,11 @@ public class FileStorageService {
         blobClient.upload(is,true);
     }
 
-    public byte[] readResourceFromBlob(String fileName,String location) throws IOException {
+    public byte[] readResourceFromBlob(String fileName,String location) {
         BlobClient blobClient = blobContainerClient.getBlobClient(location+"/"+fileName);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         blobClient.downloadStream(os);
-        final byte[] bytes = os.toByteArray();
-        return bytes;
+        return os.toByteArray();
     }
 
     public String determineDirectory(String type) throws IllegalAccessException {

@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @Service
 public class ReportService {
 
-    private Logger logger = LoggerFactory.getLogger(ReportService.class);
+    private final Logger logger = LoggerFactory.getLogger(ReportService.class);
     @Autowired
     private DomainFileRepository domainFileRepository;
     @Autowired
@@ -63,7 +63,7 @@ public class ReportService {
         }else throw new IllegalAccessException("User is not authorized to view reports");
     }
 
-    public DomainFile generateReport(List<Trip> trips) throws IOException, IllegalAccessException {
+    public DomainFile generateReport(List<Trip> trips) throws IllegalAccessException {
         trips = trips.stream().sorted(Comparator.comparing(Trip::getPickUpTime)).toList();
         LocalDate startLocalDate = trips.get(0).getPickUpTime().toLocalDateTime().toLocalDate();
         LocalDate endLocalDate = trips.get(trips.size() - 1).getPickUpTime().toLocalDateTime().toLocalDate();
@@ -112,6 +112,7 @@ public class ReportService {
                 poNumber = trip.getPoNumber();
             }
         }
+        if(newFile == null) throw new IllegalStateException("File has not been generated");
         DomainFile newDomainFile = fileStorageService.storeFile(newFile, poNumber, fileType);
         if(userService.userIsAdmin()){
             paxList.forEach(pax -> {

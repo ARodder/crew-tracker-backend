@@ -27,7 +27,7 @@ import org.springframework.web.client.HttpClientErrorException;
 @RequestMapping(path = "/api/v1/users")
 public class UserController {
 
-    private Logger logger = LoggerFactory.getLogger(UserController.class);
+    private final Logger logger = LoggerFactory.getLogger(UserController.class);
     @Autowired
     private UserService userService;
 

@@ -16,7 +16,7 @@ import java.net.URI;
 @RequestMapping("/api/v1/organizer-companies")
 public class OrganizerCompanyController {
 
-    private Logger logger = LoggerFactory.getLogger(OrganizerCompanyController.class);
+    private final Logger logger = LoggerFactory.getLogger(OrganizerCompanyController.class);
     @Autowired
     private OrganizerCompanyService organizerCompanyService;
     @Autowired

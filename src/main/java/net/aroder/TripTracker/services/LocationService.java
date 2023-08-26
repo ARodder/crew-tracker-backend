@@ -70,7 +70,7 @@ public class LocationService {
         String loginUrl = baseLocationSearchUrl + "search?q=" + name + "&countrycodes=" + countryCode + "&format=json";
         ResponseEntity<List> response = restTemplate.getForEntity(loginUrl, List.class);
         HashMap<String, Object> responseLocation;
-        if (response.getBody().size() > 0 && response.getBody().get(0) instanceof Map) {
+        if (response.getBody() != null && !response.getBody().isEmpty()  && response.getBody().get(0) != null && response.getBody().get(0) instanceof Map) {
             responseLocation = new HashMap<String, Object>((Map) response.getBody().get(0));
 
             return locationRepository.save(new Location(name, Double.parseDouble((String) responseLocation.get("lon")), Double.parseDouble((String) responseLocation.get("lat"))));

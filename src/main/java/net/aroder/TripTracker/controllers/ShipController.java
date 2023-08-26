@@ -17,7 +17,7 @@ import java.nio.file.AccessDeniedException;
 @RequestMapping(path = "/api/v1/ships")
 public class ShipController {
 
-    private Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private final Logger logger = LoggerFactory.getLogger(AuthController.class);
     @Autowired
     private ShipService shipService;
     @Autowired

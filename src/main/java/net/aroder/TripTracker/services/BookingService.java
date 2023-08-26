@@ -60,7 +60,7 @@ public class BookingService {
         if (file == null) throw new FileNotFoundException();
         Workbook workbook = new XSSFWorkbook(file.getInputStream());
         List<PAX> newPax = new ArrayList<>();
-        OrganizerCompany organizerCompany = null;
+        OrganizerCompany organizerCompany;
 
         if (userService.userIsAdmin() && companyName != null) {
             organizerCompany = organizerCompanyService.findOrganizerCompanyByName(companyName);

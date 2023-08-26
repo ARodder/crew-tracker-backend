@@ -27,7 +27,7 @@ import java.net.URI;
 @RequestMapping(path = "/api/v1/authenticate")
 public class AuthController {
 
-    private Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
     private AuthService authService;

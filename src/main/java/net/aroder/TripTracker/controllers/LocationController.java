@@ -15,7 +15,7 @@ import java.net.URI;
 @RequestMapping(path = "/api/v1/locations")
 public class LocationController {
 
-    private Logger logger = LoggerFactory.getLogger(LocationController.class);
+    private final Logger logger = LoggerFactory.getLogger(LocationController.class);
     @Autowired
     private LocationService locationservice;
 

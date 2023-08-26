@@ -35,9 +35,9 @@ import javax.naming.InvalidNameException;
 @Service
 public class FileReadingUtil {
 
-    private Logger logger = LoggerFactory.getLogger(FileReadingUtil.class);
-    private final List<String> firstNameSynonyms = Arrays.asList("firstname", "onsigners", "ofsigners");
-    private Set<String> headerContentSet;
+    private final Logger logger = LoggerFactory.getLogger(FileReadingUtil.class);
+    private final List<String> firstNameSynonyms = List.of("firstname", "onsigners", "ofsigners");
+    private final Set<String> headerContentSet;
     private final List<String> surNameSynonyms = List.of("surname", "lastname", "onsigners", "ofsigners");
     private final List<String> flightSynonyms = List.of("flight");
     private final List<String> dateSynonyms = List.of("dato", "date");

@@ -41,7 +41,7 @@ public class ReportController {
     private DomainFileMapper domainFileMapper;
     @Autowired
     private FileStorageService fileStorageService;
-    private Logger logger  = LoggerFactory.getLogger(ReportController.class);
+    private final Logger logger  = LoggerFactory.getLogger(ReportController.class);
     @Autowired
     private TripMapper tripMapper;
 
