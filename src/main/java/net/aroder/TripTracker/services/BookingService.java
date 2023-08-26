@@ -93,9 +93,16 @@ public class BookingService {
                             || pax.getFirstName().trim().length() == 0
                             || pax.getSurname() == null
                             || pax.getSurname().trim().length() == 0) continue;
-                    if (paxService.checkPassengerExistByTime(pax) && !(pax.getStatus().equals("change") || pax.getStatus().equals("cancel"))) {
-                        pax.setError("Passenger already exist with this name and time");
+                    try{
+                        if (paxService.checkPassengerExistByTime(pax) && !(pax.getStatus().equals("change") || pax.getStatus().equals("cancel"))) {
+                            pax.setError("Passenger already exist with this name and time");
+                        }
+                    }catch (Exception e){
+                        logger.error("Failed to check passenger existence");
+                        pax.setError("Failed to check passenger existence");
+                        pax.setPaxValid(false);
                     }
+
                     newPax.add(pax);
                     if(pax.getPoNumber() != null && pax.getPoNumber() != 0){
                         poNumber = pax.getPoNumber();

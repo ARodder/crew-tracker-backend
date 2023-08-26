@@ -65,6 +65,7 @@ public class PAXService {
      * @return true if a matching passenger exists and is not canceled, false otherwise.
      */
     public boolean checkPassengerExistByTime(PAX pax) {
+
         Optional<PAX> foundPax = paxRepository.findByFirstNameAndSurnameAndPickUpTime(pax.getFirstName(), pax.getSurname(), pax.getPickUpTime());
         return foundPax.isPresent() && !foundPax.get().getStatus().equals("cancel");
     }
