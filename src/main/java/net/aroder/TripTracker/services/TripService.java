@@ -200,7 +200,11 @@ public class TripService {
             endDate.setMinutes(59);
         }
         Ship foundShip = shipRepository.findByName(searchObject.getShipName()).orElse(null);
-        Location foundLocation = locationRepository.findByNameIgnoreCase(searchObject.getHarbour()).orElse(null);
+
+
+        Location foundLocation = locationService.determineLocation(searchObject.getHarbour());
+
+
         List<Trip> searchResult;
         DispatcherCompany dispatcherCompany = currentUser.getDispatcherCompany();
 
@@ -463,7 +467,7 @@ public class TripService {
             endDate.setMinutes(59);
         }
         Ship foundShip = shipRepository.findByName(searchObject.getShipName()).orElse(null);
-        Location foundLocation = locationRepository.findByNameIgnoreCase(searchObject.getHarbour()).orElse(null);
+        Location foundLocation = locationService.determineLocation(searchObject.getHarbour());
         List<Trip> searchResult;
         DispatcherCompany dispatcherCompany = currentUser.getDispatcherCompany();
         //TODO: Add search parameters
@@ -500,7 +504,7 @@ public class TripService {
         Location harbour = null;
         if(searchObject.getShip() != null && !searchObject.getShip().trim().isEmpty() && searchObject.getPoNumber() == null && searchObject.getHarbor() != null && !searchObject.getHarbor().trim().isEmpty()){
             foundShip = shipRepository.findByName(searchObject.getShip()).orElseThrow(()->new EntityNotFoundException("Could not find ship"));
-            harbour = locationRepository.findByNameIgnoreCase(searchObject.getHarbor()).orElseThrow(()->new EntityNotFoundException("Could not find harbour"));
+            harbour = locationService.determineLocation(searchObject.getHarbor());
         }
         if(foundShip == null && searchObject.getPoNumber() == null && harbour == null)throw new IllegalArgumentException("You must provide a ship and a harbour or a po number");
 
