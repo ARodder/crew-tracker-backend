@@ -71,12 +71,27 @@ public class BookingController {
             return ResponseEntity.ok(paxMapper.toPaxDTO(bookingService.readExcelFile(file,companyName)));
         } catch (IOException e) {
             logger.error("FileUpload error "+ e.getMessage());
+            String stackTrace = "";
+            for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                stackTrace+=stackTraceElement.toString()+"\n";
+            }
+            logger.error(stackTrace);
             return ResponseEntity.badRequest().build();
         }catch (ExcelInformationException e) {
             logger.error("FileUpload error "+ e.getMessage());
+            String stackTrace = "";
+            for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                stackTrace+=stackTraceElement.toString()+"\n";
+            }
+            logger.error(stackTrace);
             return ResponseEntity.badRequest().body(e.getMessage());
         }catch (Exception e) {
             logger.error("FileUpload error "+ e.getMessage());
+            String stackTrace = "";
+            for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                stackTrace+=stackTraceElement.toString()+"\n";
+            }
+            logger.error(stackTrace);
             return ResponseEntity.internalServerError().build();
         }
     }
