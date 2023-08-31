@@ -14,7 +14,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public abstract class DomainFileMapper {
     @Autowired
-    private UserMapper userMapper;
+    private  UserMapper userMapper;
 
     @Mapping(source="createdBy",target = "createdBy",qualifiedByName = "toSimpleUserDTO")
     public abstract DomainFileDTO toDomainFileDTO(DomainFile domainFile);
@@ -25,7 +25,4 @@ public abstract class DomainFileMapper {
     public SimpleUserDTO toSimpleUserDTO(User user){
         return user != null ? userMapper.toSimpleUserDTO(user):null;
     }
-
-
-
 }

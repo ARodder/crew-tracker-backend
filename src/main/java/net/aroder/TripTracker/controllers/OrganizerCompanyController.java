@@ -5,7 +5,6 @@ import net.aroder.TripTracker.mappers.OrganizerCompanyMapper;
 import net.aroder.TripTracker.services.OrganizerCompanyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +16,13 @@ import java.net.URI;
 public class OrganizerCompanyController {
 
     private final Logger logger = LoggerFactory.getLogger(OrganizerCompanyController.class);
-    @Autowired
-    private OrganizerCompanyService organizerCompanyService;
-    @Autowired
-    private OrganizerCompanyMapper organizerCompanyMapper;
+    private final OrganizerCompanyService organizerCompanyService;
+    private final OrganizerCompanyMapper organizerCompanyMapper;
+
+    public OrganizerCompanyController(final OrganizerCompanyService organizerCompanyService, final OrganizerCompanyMapper organizerCompanyMapper) {
+        this.organizerCompanyService = organizerCompanyService;
+        this.organizerCompanyMapper = organizerCompanyMapper;
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")

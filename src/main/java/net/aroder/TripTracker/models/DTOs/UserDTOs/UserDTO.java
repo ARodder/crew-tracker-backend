@@ -4,10 +4,7 @@ import lombok.Data;
 import net.aroder.TripTracker.models.DTOs.CompanyDTOs.DispatcherCompanyDTO;
 import net.aroder.TripTracker.models.DTOs.CompanyDTOs.OrganizerCompanyDTO;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * A data class representing a User DTO.

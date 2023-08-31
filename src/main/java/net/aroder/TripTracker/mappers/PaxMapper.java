@@ -23,13 +23,13 @@ import java.util.NoSuchElementException;
  */
 @Mapper(componentModel = "spring")
 public abstract class PaxMapper {
-
     @Autowired
     private ShipRepository shipRepository;
     @Autowired
     private TripRepository tripRepository;
     @Autowired
     private LocationRepository locationRepository;
+
 
     /**
      * Converts a PAX entity to a PaxDTO.

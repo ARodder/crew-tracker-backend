@@ -12,14 +12,11 @@ import net.aroder.TripTracker.repositories.TripRepository;
 import net.aroder.TripTracker.util.FileWritingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -31,35 +28,34 @@ import java.util.stream.Collectors;
 public class ReportService {
 
     private final Logger logger = LoggerFactory.getLogger(ReportService.class);
-    @Autowired
-    private DomainFileRepository domainFileRepository;
-    @Autowired
-    private PAXRepository paxRepository;
-    @Autowired
-    private TripRepository tripRepository;
-    @Autowired
-    private FileWritingUtil fileWritingUtil;
-    @Autowired
-    private FileStorageService fileStorageService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private PAXService paxService;
-    private final Integer PAGE_SIZE = 15;
+    private final DomainFileRepository domainFileRepository;
+    private final PAXRepository paxRepository;
+    private final TripRepository tripRepository;
+    private final FileWritingUtil fileWritingUtil;
+    private final FileStorageService fileStorageService;
+    private final UserService userService;
+    private final PAXService paxService;
 
-
-    private final List<String> allowedFileTypes = List.of("report", "booking");
+    public ReportService(final DomainFileRepository domainFileRepository, final PAXRepository paxRepository, final TripRepository tripRepository, final FileWritingUtil fileWritingUtil, final FileStorageService fileStorageService, final UserService userService, final PAXService paxService) {
+        this.domainFileRepository = domainFileRepository;
+        this.paxRepository = paxRepository;
+        this.tripRepository = tripRepository;
+        this.fileWritingUtil = fileWritingUtil;
+        this.fileStorageService = fileStorageService;
+        this.userService = userService;
+        this.paxService = paxService;
+    }
 
     public List<DomainFile> findAllReports(Integer pageNum) throws IllegalAccessException {
+        Integer PAGE_SIZE = 15;
         PageRequest pageRequest = PageRequest.of(pageNum, PAGE_SIZE);
 
         if(userService.userIsAdmin()){
-            List<DomainFile> foundReports = domainFileRepository.findAllByType("report", pageRequest).toList();
-            return foundReports;
+            return domainFileRepository.findAllByType("report", pageRequest).toList();
         }else if(userService.userIsManagerOrOrganizer()){
-            return domainFileRepository.findPageForOrganizerCompany("report", userService.getCurrentUser().getOrganizerCompany(), PAGE_SIZE, PAGE_SIZE*pageNum);
+            return domainFileRepository.findPageForOrganizerCompany("report", userService.getCurrentUser().getOrganizerCompany(), PAGE_SIZE, PAGE_SIZE *pageNum);
         }else if(userService.userIsDispatcher()){
-            return domainFileRepository.findPageForDispatcherCompany("report", userService.getCurrentUser().getDispatcherCompany(), PAGE_SIZE, PAGE_SIZE*pageNum);
+            return domainFileRepository.findPageForDispatcherCompany("report", userService.getCurrentUser().getDispatcherCompany(), PAGE_SIZE, PAGE_SIZE *pageNum);
         }else throw new IllegalAccessException("User is not authorized to view reports");
     }
 
@@ -67,7 +63,7 @@ public class ReportService {
         trips = trips.stream().sorted(Comparator.comparing(Trip::getPickUpTime)).toList();
         LocalDate startLocalDate = trips.get(0).getPickUpTime().toLocalDateTime().toLocalDate();
         LocalDate endLocalDate = trips.get(trips.size() - 1).getPickUpTime().toLocalDateTime().toLocalDate();
-        String fileName = "";
+        String fileName;
         File newFile = null;
         Long poNumber = null;
         String fileType = "report";
@@ -133,7 +129,7 @@ public class ReportService {
         return newDomainFile;
     }
 
-    public FileDownloadObject findResourceRemote(Long domainFileId) throws IOException {
+    public FileDownloadObject findResourceRemote(Long domainFileId) {
         DomainFile df = domainFileRepository.findById(domainFileId).orElseThrow(()-> new EntityNotFoundException("Could not find file"));
         FileDownloadObject fdo = new FileDownloadObject();
         fdo.setFilename(df.getName());
@@ -150,39 +146,43 @@ public class ReportService {
         || !userService.userIsAdmin()) throw new IllegalAccessException("This user cannot access this file. Companies does not match and user is not admin");
 
 
-        if(currentDomainFile.getClassification().equals("ADMIN")){
-            List<PAX> associatedPax = currentDomainFile.getAdminFileContent();
-            Set<Trip> associatedTrips = associatedPax.stream().map(PAX::getTrip).collect(Collectors.toSet());
-            associatedPax.forEach(pax -> {
-                pax.setAdminReport(null);
-                paxRepository.save(pax);
-            });
-            associatedTrips.forEach(trip ->{
-                trip.setAdminReported(false);
-                tripRepository.save(trip);
-            });
-        } else if (currentDomainFile.getClassification().equals("MANAGER")) {
-            List<PAX> associatedPax = currentDomainFile.getOrganizerFileContent();
-            Set<Trip> associatedTrips = associatedPax.stream().map(PAX::getTrip).collect(Collectors.toSet());
-            associatedPax.forEach(pax -> {
-                pax.setOrganizerReport(null);
-                paxRepository.save(pax);
-            });
-            associatedTrips.forEach(trip ->{
-                trip.setAdminReported(false);
-                tripRepository.save(trip);
-            });
-        } else if (currentDomainFile.getClassification().equals("DISPATCHER")) {
-            List<PAX> associatedPax = currentDomainFile.getOrganizerFileContent();
-            Set<Trip> associatedTrips = associatedPax.stream().map(PAX::getTrip).collect(Collectors.toSet());
-            associatedPax.forEach(pax -> {
-                pax.setDispatchReport(null);
-                paxRepository.save(pax);
-            });
-            associatedTrips.forEach(trip ->{
-                trip.setAdminReported(false);
-                tripRepository.save(trip);
-            });
+        switch (currentDomainFile.getClassification()) {
+            case "ADMIN" -> {
+                List<PAX> associatedPax = currentDomainFile.getAdminFileContent();
+                Set<Trip> associatedTrips = associatedPax.stream().map(PAX::getTrip).collect(Collectors.toSet());
+                associatedPax.forEach(pax -> {
+                    pax.setAdminReport(null);
+                    paxRepository.save(pax);
+                });
+                associatedTrips.forEach(trip -> {
+                    trip.setAdminReported(false);
+                    tripRepository.save(trip);
+                });
+            }
+            case "MANAGER" -> {
+                List<PAX> associatedPax = currentDomainFile.getOrganizerFileContent();
+                Set<Trip> associatedTrips = associatedPax.stream().map(PAX::getTrip).collect(Collectors.toSet());
+                associatedPax.forEach(pax -> {
+                    pax.setOrganizerReport(null);
+                    paxRepository.save(pax);
+                });
+                associatedTrips.forEach(trip -> {
+                    trip.setAdminReported(false);
+                    tripRepository.save(trip);
+                });
+            }
+            case "DISPATCHER" -> {
+                List<PAX> associatedPax = currentDomainFile.getOrganizerFileContent();
+                Set<Trip> associatedTrips = associatedPax.stream().map(PAX::getTrip).collect(Collectors.toSet());
+                associatedPax.forEach(pax -> {
+                    pax.setDispatchReport(null);
+                    paxRepository.save(pax);
+                });
+                associatedTrips.forEach(trip -> {
+                    trip.setAdminReported(false);
+                    tripRepository.save(trip);
+                });
+            }
         }
         fileStorageService.deleteBlobFile(currentDomainFile.getLocation()+"/"+currentDomainFile.getName());
         domainFileRepository.delete(currentDomainFile);

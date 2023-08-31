@@ -9,12 +9,9 @@ import net.aroder.TripTracker.models.DTOs.UserDTOs.PasswordUpdateRequest;
 import net.aroder.TripTracker.models.DTOs.UserDTOs.UserUpdateRequest;
 import net.aroder.TripTracker.models.Email;
 import net.aroder.TripTracker.models.User;
-import net.aroder.TripTracker.repositories.DispatcherCompanyRepository;
-import net.aroder.TripTracker.repositories.OrganizerCompanyRepository;
 import net.aroder.TripTracker.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.access.AccessDeniedException;
@@ -35,34 +32,36 @@ import java.util.Map;
  */
 @Service
 public class AuthService {
-
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
-
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private RestTemplate restTemplate;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private OrganizerCompanyRepository organizerCompanyRepository;
-    @Autowired
-    private DispatcherCompanyRepository dispatcherCompanyRepository;
-    @Autowired
-    private EmailSender emailSender;
+    private final UserService userService;
+    private final RestTemplate restTemplate;
+    private final UserRepository userRepository;
+    private final EmailSender emailSender;
     private final List<String> allRoles = List.of("DRIVER", "ADMIN", "ORGANIZER", "DISPATCHER","MANAGER");
-    @Value("${keycloak.base-url}")
-    private String baseUrl;
-    @Value("${keycloak.realm}")
-    private String realm;
-    @Value("${keycloak.client-id}")
-    private String clientId;
-    @Value("${keycloak.client-secret}")
-    private String clientSecret;
+    private final String baseUrl;
+    private final String realm;
+    private final String clientId;
+    private final String clientSecret;
+    public AuthService(final UserService userService,
+                       final RestTemplate restTemplate,
+                       final UserRepository userRepository,
+                       final EmailSender emailSender,
+                       @Value("${keycloak.base-url}") final String baseUrl,
+                       @Value("${keycloak.realm}") final String realm,
+                       @Value("${keycloak.client-id}")final String clientId,
+                       @Value("${keycloak.client-secret}")final String clientSecret) {
+        this.userService = userService;
+        this.restTemplate = restTemplate;
+        this.userRepository = userRepository;
+        this.emailSender = emailSender;
+        this.baseUrl = baseUrl;
+        this.realm = realm;
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+    }
 
     private static final String CLIENT_ID_KEY = "client_id";
     private static final String CLIENT_SECRET_KEY = "client_secret";
-    private static final String TOKEN_KEY = "token";
     private static final String REFRESH_TOKEN_KEY = "refresh_token";
     private static final String GRANT_TYPE_KEY = "grant_type";
     private static final String AUTHORIZATION_KEY = "Authorization";
@@ -93,8 +92,7 @@ public class AuthService {
 
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(map, headers);
         String loginUrl = this.baseUrl + "realms/" + this.realm + "/protocol/openid-connect/token";
-        ResponseEntity<LoginResponse> response = restTemplate.postForEntity(loginUrl, httpEntity, LoginResponse.class);
-        return response;
+        return restTemplate.postForEntity(loginUrl, httpEntity, LoginResponse.class);
     }
 
     /**
@@ -110,12 +108,12 @@ public class AuthService {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("client_id", this.clientId);
         map.add("client_secret", this.clientSecret);
-        map.add("refresh_token", request.getToken());
+        map.add(REFRESH_TOKEN_KEY, request.getToken());
 
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(map, headers);
 
         var signOutUrl = baseUrl + "/auth/realms/" + realm + "/protocol/openid-connect/logout";
-        var response = restTemplate.postForEntity(signOutUrl, httpEntity, SignoutResponse.class);
+        var response = restTemplate.postForEntity(signOutUrl, httpEntity, SignOutResponse.class);
 
         return response.getStatusCode().is2xxSuccessful();
     }
@@ -133,8 +131,8 @@ public class AuthService {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("client_id", this.clientId);
         map.add("client_secret", this.clientSecret);
-        map.add("grant_type", "refresh_token");
-        map.add("refresh_token", token.getToken());
+        map.add("grant_type", REFRESH_TOKEN_KEY);
+        map.add(REFRESH_TOKEN_KEY, token.getToken());
 
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(map, headers);
         String loginUrl = this.baseUrl + "realms/" + this.realm + "/protocol/openid-connect/token";
@@ -238,7 +236,7 @@ public class AuthService {
 
 
     /**
-     * Returns a string for the authorization field in an http request in the format
+     * Returns a string for the authorization field in a http request in the format
      * "Bearer token"
      *
      * @param token the token to be used in the authorization field
@@ -252,7 +250,7 @@ public class AuthService {
     /**
      * Generates headers for http request with admin access
      *
-     * @return http headers that can be used in an http request with admin access
+     * @return http headers that can be used in a http request with admin access
      */
     private HttpHeaders getAdminHeaders() {
         HttpHeaders headers = new HttpHeaders();
@@ -456,7 +454,7 @@ public class AuthService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         String url = baseUrl + "admin/realms/"+realm+"/users/"+userId+"/send-verify-email";
-        var response = restTemplate.exchange(url,HttpMethod.PUT,new HttpEntity<>(headers),String.class);
+        restTemplate.exchange(url,HttpMethod.PUT,new HttpEntity<>(headers),String.class);
 
 
     }
@@ -468,7 +466,7 @@ public class AuthService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         String url = baseUrl + "admin/realms/"+realm+"/users/"+foundUser.getId()+"/execute-actions-email";
-        var response = restTemplate.exchange(url,HttpMethod.PUT,new HttpEntity<>(List.of("UPDATE_PASSWORD"),headers),String.class);
+        restTemplate.exchange(url,HttpMethod.PUT,new HttpEntity<>(List.of("UPDATE_PASSWORD"),headers),String.class);
 
     }
 
@@ -486,8 +484,7 @@ public class AuthService {
 
     public void sendInitialPasswordEmail(String initialPassword,String recipient){
         Email email = new Email(recipient, Email.Subject.INITIAL_PASSWORD,initialPassword);
-        var futureResult = emailSender.sendMail(email);
-
+        emailSender.sendMail(email);
     }
 
     public List<String> getAllRoles() throws IllegalAccessException {

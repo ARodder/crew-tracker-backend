@@ -6,7 +6,7 @@ import java.util.Calendar;
  * Useful Calendar utilities.
  *
  * @author BalusC
- * @link http://balusc.omnifaces.org/2007/09/calendarutil.html
+ * @link <a href="http://balusc.omnifaces.org/2007/09/calendarutil.html">...</a>
  */
 public final class CalendarUtil {
 

@@ -2,10 +2,8 @@ package net.aroder.TripTracker.Scheduling;
 
 import net.aroder.TripTracker.repositories.PAXRepository;
 import net.aroder.TripTracker.repositories.TripRepository;
-import net.aroder.TripTracker.services.BookingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,11 +15,13 @@ import java.sql.Timestamp;
 public class SchedulingConfig {
 
     private final Logger logger = LoggerFactory.getLogger(SchedulingConfig.class);
+    private final PAXRepository paxRepository;
+    private final TripRepository tripRepository;
 
-    @Autowired
-    private PAXRepository paxRepository;
-    @Autowired
-    private TripRepository tripRepository;
+    public SchedulingConfig(final PAXRepository paxRepository, final TripRepository tripRepository){
+        this.paxRepository = paxRepository;
+        this.tripRepository = tripRepository;
+    }
 
 
     @Scheduled(cron = "0 0 0 * * *", zone = "Europe/Oslo")

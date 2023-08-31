@@ -5,7 +5,6 @@ import net.aroder.TripTracker.models.DTOs.ShipDTOs.ShipDTO;
 import net.aroder.TripTracker.services.ShipService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +17,13 @@ import java.nio.file.AccessDeniedException;
 public class ShipController {
 
     private final Logger logger = LoggerFactory.getLogger(AuthController.class);
-    @Autowired
-    private ShipService shipService;
-    @Autowired
-    private ShipMapper shipMapper;
+    private final ShipService shipService;
+    private final ShipMapper shipMapper;
+
+    public ShipController(final ShipService shipService, final ShipMapper shipMapper){
+        this.shipService = shipService;
+        this.shipMapper = shipMapper;
+    }
 
 
     @PreAuthorize("isAuthenticated()")

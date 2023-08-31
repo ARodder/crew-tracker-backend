@@ -2,7 +2,6 @@ package net.aroder.TripTracker.services;
 
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
-import com.azure.storage.blob.BlobServiceClient;
 import net.aroder.TripTracker.models.DomainFile;
 import net.aroder.TripTracker.repositories.DomainFileRepository;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -12,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.nio.file.Path;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import net.aroder.TripTracker.exceptions.FileStorageException;
 import org.springframework.util.StringUtils;
 import java.sql.Timestamp;
@@ -23,14 +21,15 @@ import java.sql.Timestamp;
 @Service
 public class FileStorageService {
 
-    @Autowired
-    private DomainFileRepository domainFileRepository;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private BlobServiceClient blobServiceClient;
-    @Autowired
-    private BlobContainerClient blobContainerClient;
+    private final DomainFileRepository domainFileRepository;
+    private final UserService userService;
+    private final BlobContainerClient blobContainerClient;
+
+    public FileStorageService(final DomainFileRepository domainFileRepository, final UserService userService, final BlobContainerClient blobContainerClient) {
+        this.domainFileRepository = domainFileRepository;
+        this.userService = userService;
+        this.blobContainerClient = blobContainerClient;
+    }
 
     /**
      * Stores a file locally
@@ -74,8 +73,10 @@ public class FileStorageService {
             writeResourceToBlob(targetLocation+fileName,file.getInputStream());
             return createDomainFileReference(fileName, poNumber,Path.of(targetLocation), file.getSize(), "Order");
 
-        } catch (IOException | IllegalAccessException ex) {
+        } catch (IllegalAccessException ex) {
             throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -112,7 +113,7 @@ public class FileStorageService {
         return tempFile;
     }
 
-    public void writeResourceToBlob(String fileName, InputStream is) throws IOException {
+    public void writeResourceToBlob(String fileName, InputStream is) {
         BlobClient blobClient = blobContainerClient.getBlobClient(fileName);
         blobClient.upload(is,true);
     }

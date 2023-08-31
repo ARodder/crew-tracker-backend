@@ -1,7 +1,6 @@
 package net.aroder.TripTracker.models;
 
 import lombok.Data;
-import net.aroder.TripTracker.models.DTOs.EmailDto;
 
 import java.util.Objects;
 import java.util.regex.Pattern;

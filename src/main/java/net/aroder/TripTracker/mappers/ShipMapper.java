@@ -13,9 +13,9 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public abstract class ShipMapper {
-
     @Autowired
     private OrganizerCompanyRepository organizerCompanyRepository;
+
 
     @Mapping(source = "organizerCompany",target = "organizerCompanyId",qualifiedByName = "organizerCompanyToOrganizerCompanyId")
     public abstract ShipDTO toShipDto(Ship ship);

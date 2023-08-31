@@ -15,7 +15,6 @@ import net.aroder.TripTracker.services.TripService;
 import net.aroder.TripTracker.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
@@ -24,7 +23,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 /**
  * Controller registering the required endpoints for trips.
@@ -33,15 +31,15 @@ import java.util.List;
 @RequestMapping(path = "/api/v1/trips")
 public class TripController {
     private static final Logger logger = LoggerFactory.getLogger(TripController.class);
+    private final TripMapper tripMapper;
+    private final TripService tripService;
+    private final UserService userService;
 
-
-    @Autowired
-    private TripMapper tripMapper;
-
-    @Autowired
-    private TripService tripService;
-    @Autowired
-    private UserService userService;
+    public TripController(final TripMapper tripMapper, final TripService tripService, final UserService userService) {
+        this.tripMapper = tripMapper;
+        this.tripService = tripService;
+        this.userService = userService;
+    }
 
     @GetMapping("/page/{pageNum}")
     @Operation(summary = "Retrieves a paginated list of trips")

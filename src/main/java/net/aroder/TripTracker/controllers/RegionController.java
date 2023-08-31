@@ -3,11 +3,9 @@ package net.aroder.TripTracker.controllers;
 import jakarta.persistence.EntityNotFoundException;
 import net.aroder.TripTracker.mappers.RegionMapper;
 import net.aroder.TripTracker.models.DTOs.RegionDTOs.NewRegionDTO;
-import net.aroder.TripTracker.models.DTOs.RegionDTOs.RegionDTO;
 import net.aroder.TripTracker.services.RegionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +18,13 @@ public class RegionController {
 
     private final Logger logger = LoggerFactory.getLogger(RegionController.class);
 
-    @Autowired
-    private RegionService regionService;
-    @Autowired
-    private RegionMapper regionMapper;
+    private final RegionService regionService;
+    private final RegionMapper regionMapper;
+
+    public RegionController(final RegionService regionService, final RegionMapper regionMapper) {
+        this.regionService = regionService;
+        this.regionMapper = regionMapper;
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")

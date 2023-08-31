@@ -12,7 +12,6 @@ import net.aroder.TripTracker.models.DTOs.TripDTOs.TripDTO;
 import net.aroder.TripTracker.services.PAXService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -24,10 +23,13 @@ import org.springframework.web.bind.annotation.*;
 public class PAXController {
 
     private final Logger logger = LoggerFactory.getLogger(PAXController.class);
-    @Autowired
-    private PAXService paxService;
-    @Autowired
-    private PaxMapper paxMapper;
+    private final PAXService paxService;
+    private final PaxMapper paxMapper;
+
+    public PAXController(final PAXService paxService, final PaxMapper paxMapper){
+        this.paxService = paxService;
+        this.paxMapper = paxMapper;
+    }
 
     @GetMapping("/toggleCancel/{passengerId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ORGANIZER')")

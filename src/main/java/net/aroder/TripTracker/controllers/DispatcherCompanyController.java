@@ -5,7 +5,6 @@ import net.aroder.TripTracker.mappers.DispatcherCompanyMapper;
 import net.aroder.TripTracker.services.DispatcherCompanyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +16,15 @@ import java.net.URI;
 public class DispatcherCompanyController {
 
     private final Logger logger = LoggerFactory.getLogger(DispatcherCompanyController.class);
-    @Autowired
-    private DispatcherCompanyService dispatcherCompanyService;
-    @Autowired
-    private DispatcherCompanyMapper dispatcherCompanyMapper;
+
+    private final DispatcherCompanyService dispatcherCompanyService;
+
+    private final DispatcherCompanyMapper dispatcherCompanyMapper;
+
+    public DispatcherCompanyController(final DispatcherCompanyService dispatcherCompanyService, final DispatcherCompanyMapper dispatcherCompanyMapper){
+        this.dispatcherCompanyService = dispatcherCompanyService;
+        this.dispatcherCompanyMapper = dispatcherCompanyMapper;
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")

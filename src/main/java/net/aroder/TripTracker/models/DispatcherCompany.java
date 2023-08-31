@@ -3,7 +3,6 @@ package net.aroder.TripTracker.models;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.Fetch;
 
 import java.util.ArrayList;
 import java.util.List;

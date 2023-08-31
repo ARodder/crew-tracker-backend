@@ -1,8 +1,6 @@
 package net.aroder.TripTracker.models;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -57,7 +55,7 @@ public class PAX {
 
     @Override
     public String toString(){
-        String builder = "PAX(" +
+        return "PAX(" +
                 "id=" + (this.id != null ? this.id : "") + "," +
                 "status=" + (this.status != null ? this.status : null) + "," +
                 "firstName=" + (this.firstName != null ? this.firstName : "") + "," +
@@ -79,6 +77,5 @@ public class PAX {
                 "cost=" + (this.cost != null ? this.cost : "") +
                 ")";
 
-        return builder;
     }
 }

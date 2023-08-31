@@ -4,7 +4,6 @@ import net.aroder.TripTracker.models.Location;
 import net.aroder.TripTracker.models.Region;
 import net.aroder.TripTracker.repositories.LocationRepository;
 import net.aroder.TripTracker.repositories.RegionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,17 +22,24 @@ import java.util.Optional;
  */
 @Service
 public class LocationService {
+    private final LocationRepository locationRepository;
+    private final RestTemplate restTemplate;
+    private final RegionRepository regionRepository;
+    private final String countryCode;
+    private final String baseLocationSearchUrl;
 
-    @Autowired
-    private LocationRepository locationRepository;
-    @Autowired
-    private RestTemplate restTemplate;
-    @Autowired
-    private RegionRepository regionRepository;
-    @Value("${location.country-code}")
-    private String countryCode;
-    @Value("${location.search.url}")
-    private String baseLocationSearchUrl;
+    public LocationService(final LocationRepository locationRepository,
+                           final RestTemplate restTemplate,
+                           final RegionRepository regionRepository,
+                           @Value("${location.country-code}") final String countryCode,
+                           @Value("${location.search.url}") final String baseLocationSearchUrl) {
+        this.locationRepository = locationRepository;
+        this.restTemplate = restTemplate;
+        this.regionRepository = regionRepository;
+        this.countryCode = countryCode;
+        this.baseLocationSearchUrl = baseLocationSearchUrl;
+    }
+
 
 
     /**
@@ -91,7 +97,7 @@ public class LocationService {
         String loginUrl = baseLocationSearchUrl + "search?q=" + location.getName() + "&countrycodes=" + countryCode + "&format=json";
         ResponseEntity<List> response = restTemplate.getForEntity(loginUrl, List.class);
         HashMap<String, Object> responseLocation;
-        if (response.getBody().size() > 0 && response.getBody().get(0) instanceof Map) {
+        if (response.getBody() != null && response.getBody().size() > 0 && response.getBody().get(0) instanceof Map) {
             responseLocation = new HashMap<String, Object>((Map) response.getBody().get(0));
             location.setLongitude(Double.parseDouble((String) responseLocation.get("lon")));
             location.setLatitude(Double.parseDouble((String) responseLocation.get("lat")));
@@ -115,9 +121,9 @@ public class LocationService {
         List<Region> regions = regionRepository.findAll();
 
         Region closestRegion = null;
-        Double closestRegionDistance = 0.0;
+        double closestRegionDistance = 0.0;
         for (Region region : regions) {
-            Double currentRegionDistance = calculateDirectDistance(region.getRegionLocation(), harbour);
+            double currentRegionDistance = calculateDirectDistance(region.getRegionLocation(), harbour);
             if (closestRegion == null) {
                 closestRegion = region;
                 closestRegionDistance = currentRegionDistance;
@@ -137,20 +143,20 @@ public class LocationService {
      * @return the distance in kilometers between the two given points
      */
     private Double calculateDirectDistance(Location locationA, Location locationB) {
-        Double latA = Math.toRadians(locationA.getLatitude());
-        Double longA = Math.toRadians(locationA.getLongitude());
+        double latA = Math.toRadians(locationA.getLatitude());
+        double longA = Math.toRadians(locationA.getLongitude());
 
-        Double latB = Math.toRadians(locationB.getLatitude());
-        Double longB = Math.toRadians(locationB.getLongitude());
+        double latB = Math.toRadians(locationB.getLatitude());
+        double longB = Math.toRadians(locationB.getLongitude());
 
-        Double earthRadius = 6371.0;
+        double earthRadius = 6371.0;
 
         //deltas
-        Double dLat = latB - latA;
-        Double dLong = longB - longA;
+        double dLat = latB - latA;
+        double dLong = longB - longA;
 
-        Double a = Math.pow(Math.sin(dLat / 2), 2) + Math.cos(latA) * Math.cos(latB) * Math.pow(Math.sin(dLong / 2), 2);
-        Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double a = Math.pow(Math.sin(dLat / 2), 2) + Math.cos(latA) * Math.cos(latB) * Math.pow(Math.sin(dLong / 2), 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return earthRadius * c;
     }
 

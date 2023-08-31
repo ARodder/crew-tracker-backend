@@ -3,16 +3,17 @@ package net.aroder.TripTracker.services;
 import jakarta.persistence.EntityNotFoundException;
 import net.aroder.TripTracker.models.OrganizerCompany;
 import net.aroder.TripTracker.repositories.OrganizerCompanyRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class OrganizerCompanyService {
+    private final OrganizerCompanyRepository organizerCompanyRepository;
 
-    @Autowired
-    private OrganizerCompanyRepository organizerCompanyRepository;
+    public OrganizerCompanyService(final OrganizerCompanyRepository organizerCompanyRepository){
+        this.organizerCompanyRepository = organizerCompanyRepository;
+    }
 
     public List<OrganizerCompany> findAllOrganizerCompanies(){
         return organizerCompanyRepository.findAll();

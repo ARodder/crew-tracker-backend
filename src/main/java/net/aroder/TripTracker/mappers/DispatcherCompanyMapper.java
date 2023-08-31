@@ -19,6 +19,7 @@ public abstract class DispatcherCompanyMapper {
     private RegionService regionService;
 
 
+
     @Mapping(source = "regions",target = "regions",qualifiedByName = "regionToRegionName")
     public abstract DispatcherCompanyDTO toDispatcherCompanyDto(DispatcherCompany dispatcherCompany);
 
@@ -41,7 +42,7 @@ public abstract class DispatcherCompanyMapper {
 
     @Named("regionNameToRegion")
     public List<Region> regionNameToRegion(List<String> regionNames){
-        return regionNames != null ? regionNames.stream().map((regionName)->regionService.findRegionByName(regionName)).toList(): null;
+        return regionNames != null ? regionNames.stream().map(regionService::findRegionByName).toList(): null;
     }
 
     @Named("driversToEmployeeCount")

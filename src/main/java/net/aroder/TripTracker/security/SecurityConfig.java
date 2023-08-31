@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
@@ -30,8 +29,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    @Value("${security.allowed-origins}")
-    private String allowedOrigins;
+
+    private final String allowedOrigins;
+
+    public SecurityConfig(final @Value("${security.allowed-origins}") String allowedOrigins) {
+        this.allowedOrigins = allowedOrigins;
+    }
 
 
     /**
@@ -45,19 +48,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors().and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .csrf().disable()
+                .cors(cors-> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf->csrf.disable())
+                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         // Specify paths where public access is allowed
                         .requestMatchers("/api/v1/authenticate").permitAll()
                         .requestMatchers("/api/v1/authenticate/refresh").permitAll()
                         .requestMatchers("/api/v1/authenticate/forgot-password").permitAll()
                         .anyRequest().authenticated())
-                .oauth2ResourceServer()
-                .jwt()
-                .jwtAuthenticationConverter(jwtRoleAuthenticationConverter());
+                .oauth2ResourceServer((oauth2)-> oauth2.jwt((jwt)-> jwt.jwtAuthenticationConverter(jwtRoleAuthenticationConverter())));
         return http.build();
     }
 
@@ -80,18 +80,6 @@ public class SecurityConfig {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
     }
-
-    /**
-     * Configures the web security filter to allow browsing the Swagger documentation.
-     *
-     * @return the configured WebSecurityCustomizer
-     */
-    //Uncomment this to allow browsing the Swagger documentation
-//    @Bean
-//    public WebSecurityCustomizer webSecurityCustomizer(){
-//        return web -> web.ignoring()
-//        .requestMatchers("/swagger-ui/**","/v3/api-docs/**","/swagger-ui.html");
-//    }
 
     /**
      * Creates a RestTemplate bean.

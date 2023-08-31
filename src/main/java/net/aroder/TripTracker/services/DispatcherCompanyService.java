@@ -2,9 +2,7 @@ package net.aroder.TripTracker.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import net.aroder.TripTracker.models.DispatcherCompany;
-import net.aroder.TripTracker.models.Location;
 import net.aroder.TripTracker.repositories.DispatcherCompanyRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,8 +12,11 @@ import java.util.List;
 @Service
 public class DispatcherCompanyService {
 
-    @Autowired
-    private DispatcherCompanyRepository dispatcherCompanyRepository;
+    private final DispatcherCompanyRepository dispatcherCompanyRepository;
+
+    public DispatcherCompanyService(final DispatcherCompanyRepository dispatcherCompanyRepository){
+        this.dispatcherCompanyRepository = dispatcherCompanyRepository;
+    }
 
     public List<DispatcherCompany> findAllDispatcherCompanies(){
         return dispatcherCompanyRepository.findAll();
