@@ -40,7 +40,7 @@ public interface PAXRepository extends JpaRepository<PAX, Long> {
 
     Optional<PAX> findByFirstNameAndSurnameAndPickUpLocationAndDestination(String firstName, String surname, String pickUpLocation, String destination);
 
-    Optional<PAX> findByFirstNameAndSurnameAndPickUpTimeAndPickUpTimeAfter(String firstName, String surname,Timestamp pickUpTime, Timestamp currentTime);
+    //Optional<PAX> findByFirstNameAndSurnameAndPickUpTimeAndPickUpTimeAfter(String firstName, String surname,Timestamp pickUpTime, Timestamp currentTime);
 
 
     List<PAX> findByExpirationDateBefore(Timestamp timestamp);

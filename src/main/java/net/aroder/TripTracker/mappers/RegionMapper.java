@@ -13,8 +13,10 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public abstract class RegionMapper {
+
     @Autowired
     private DispatcherCompanyMapper dispatcherCompanyMapper;
+
 
     @Mapping(source = "dispatcherCompany",target="dispatcherCompany", qualifiedByName = "dispatcherCompanyToDispatcherCompanyDTO")
     public abstract RegionDTO toRegionDto(Region region);

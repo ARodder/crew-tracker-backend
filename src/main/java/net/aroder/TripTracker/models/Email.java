@@ -1,8 +1,8 @@
 package net.aroder.TripTracker.models;
 
 import lombok.Data;
-import net.aroder.TripTracker.models.DTOs.EmailDto;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 @Data
@@ -45,10 +45,10 @@ public class Email {
         this.recipient = recipient.toLowerCase();
         this.emailSubject = emailSubject;
 
-        switch (emailSubject) {
-            case INITIAL_PASSWORD ->
-                    emailBody = "<center><h1 style='color:#FED400; font-size:4rem;'>CrewTracker Norge</h1><h2>Initial Password</h2><p style='color:#ffffff; margin-bottom:2rem; margin-top:-0.05rem;'>We advice you to change the password upon your first login</p><div style='width:95%; height:5rem; background-color:unset; border-color:#FED400; border-style:dotted; border-width:0.2rem;  border-radius:1rem; padding:0.5rem; color:unset; font-size:1.5rem;'><h1>" + content + "</h1></div></center>";
-            default -> throw new IllegalArgumentException("Invalid email subject: " + emailSubject.getText());
+        if (Objects.requireNonNull(emailSubject) == Subject.INITIAL_PASSWORD) {
+            emailBody = "<center><h1 style='color:#FED400; font-size:4rem;'>CrewTracker Norge</h1><h2>Initial Password</h2><p style='color:#ffffff; margin-bottom:2rem; margin-top:-0.05rem;'>We advice you to change the password upon your first login</p><div style='width:95%; height:5rem; background-color:unset; border-color:#FED400; border-style:dotted; border-width:0.2rem;  border-radius:1rem; padding:0.5rem; color:unset; font-size:1.5rem;'><h1>" + content + "</h1></div></center>";
+        } else {
+            throw new IllegalArgumentException("Invalid email subject: " + emailSubject.getText());
         }
     }
 

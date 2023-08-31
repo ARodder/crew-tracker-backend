@@ -6,7 +6,6 @@ import net.aroder.TripTracker.models.DTOs.AuthDTOs.*;
 import net.aroder.TripTracker.models.DTOs.UserDTOs.UserDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,15 +26,20 @@ import java.net.URI;
 @RequestMapping(path = "/api/v1/authenticate")
 public class AuthController {
 
-    private Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    @Autowired
-    private AuthService authService;
-    @Autowired
-    private UserMapper userMapper;
+
+    private final AuthService authService;
+    private final UserMapper userMapper;
+
+    public AuthController(final AuthService authService, final UserMapper userMapper) {
+        this.authService = authService;
+        this.userMapper = userMapper;
+
+    }
 
     @PostMapping
-    @Operation(summary = "Login to keycloak and retrieve accsess_token")
+    @Operation(summary = "Login to keycloak and retrieve access_token")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Success", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponse.class))
@@ -77,7 +81,7 @@ public class AuthController {
     @Operation(summary = "Refresh access_token using refresh_token")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Success", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = SignoutResponse.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = SignOutResponse.class))
             }),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))
@@ -97,7 +101,7 @@ public class AuthController {
     @PreAuthorize("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_DISPATCHER')")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Success", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = SignoutResponse.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = SignOutResponse.class))
             }),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))
@@ -124,7 +128,7 @@ public class AuthController {
     @PreAuthorize("hasRole('ROLE_DISPATCHER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Success", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = SignoutResponse.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = SignOutResponse.class))
             }),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))
@@ -146,7 +150,7 @@ public class AuthController {
     @PreAuthorize("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_DISPATCHER') ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Success", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = SignoutResponse.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = SignOutResponse.class))
             }),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))
@@ -170,7 +174,7 @@ public class AuthController {
     @PreAuthorize("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_DISPATCHER')")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "Accepted", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = SignoutResponse.class))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = SignOutResponse.class))
             }),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = ProblemDetail.class))

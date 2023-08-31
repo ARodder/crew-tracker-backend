@@ -6,7 +6,6 @@ import net.aroder.TripTracker.models.DispatcherCompany;
 import net.aroder.TripTracker.models.Location;
 import net.aroder.TripTracker.models.Region;
 import net.aroder.TripTracker.repositories.RegionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,13 +14,15 @@ import java.util.List;
 
 @Service
 public class RegionService {
+    private final RegionRepository regionRepository;
+    private final LocationService locationService;
+    private final DispatcherCompanyService dispatcherCompanyService;
 
-    @Autowired
-    private RegionRepository regionRepository;
-    @Autowired
-    private LocationService locationService;
-    @Autowired
-    private DispatcherCompanyService dispatcherCompanyService;
+    public RegionService(final RegionRepository regionRepository, final LocationService locationService, final DispatcherCompanyService dispatcherCompanyService){
+        this.regionRepository = regionRepository;
+        this.locationService = locationService;
+        this.dispatcherCompanyService = dispatcherCompanyService;
+    }
 
     public List<Region> findAllRegions(){
         return regionRepository.findAll();
@@ -38,7 +39,10 @@ public class RegionService {
     public Region updateRegion(Region region){
         if(region.getId() == null || region.getName() == null || region.getRegionLocation() == null) throw new IllegalArgumentException("id, location or name cant be null");
         Region foundRegion = regionRepository.findById(region.getId()).orElseThrow(()-> new EntityNotFoundException("Cant find region"));
-        return regionRepository.save(region);
+        foundRegion.setName(region.getName());
+        foundRegion.setRegionLocation(region.getRegionLocation());
+        foundRegion.setDispatcherCompany(region.getDispatcherCompany());
+        return regionRepository.save(foundRegion);
     }
 
     public Region updateRegionName(Long regionId,String newName){

@@ -8,34 +8,20 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import net.aroder.TripTracker.exceptions.ExcelInformationException;
 import net.aroder.TripTracker.mappers.PaxMapper;
-import net.aroder.TripTracker.models.DTOs.AuthDTOs.LoginResponse;
 import net.aroder.TripTracker.models.DTOs.PaxDTOs.PaxDTO;
 import net.aroder.TripTracker.models.PAX;
-import org.mapstruct.factory.Mappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import jakarta.servlet.http.HttpServletRequest;
-
-import org.springframework.http.HttpHeaders;
 import java.io.IOException;
-import org.springframework.http.MediaType;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
 
-import net.aroder.TripTracker.models.DTOs.UploadFileResponse;
 import net.aroder.TripTracker.services.BookingService;
-import net.aroder.TripTracker.services.FileStorageService;
 
 /**
  * Controller registering the required endpoints for booking.
@@ -45,14 +31,14 @@ import net.aroder.TripTracker.services.FileStorageService;
 public class BookingController {
     private static final Logger logger = LoggerFactory.getLogger(BookingController.class);
 
-    @Autowired
-    private PaxMapper paxMapper;
+    private final PaxMapper paxMapper;
 
-    @Autowired
-    private FileStorageService fileStorageService;
+    private final BookingService bookingService;
 
-    @Autowired
-    private BookingService bookingService;
+    public BookingController(final PaxMapper paxMapper,final BookingService bookingService){
+        this.paxMapper = paxMapper;
+        this.bookingService = bookingService;
+    }
 
 
     @PostMapping("/uploadBooking")

@@ -4,7 +4,6 @@ import net.aroder.TripTracker.models.Location;
 import net.aroder.TripTracker.services.LocationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -15,16 +14,20 @@ import java.net.URI;
 @RequestMapping(path = "/api/v1/locations")
 public class LocationController {
 
-    private Logger logger = LoggerFactory.getLogger(LocationController.class);
-    @Autowired
-    private LocationService locationservice;
+    private final Logger logger = LoggerFactory.getLogger(LocationController.class);
+
+    private final LocationService locationService;
+
+    public LocationController(final LocationService locationservice){
+        this.locationService = locationservice;
+    }
 
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/search")
     public ResponseEntity searchLocationNames(@RequestParam("searchWord") String searchWord){
         try{
-            return ResponseEntity.ok(locationservice.searchLocationsLikeName(searchWord));
+            return ResponseEntity.ok(locationService.searchLocationsLikeName(searchWord));
         } catch(Exception e){
             logger.error("Error searching for locations " + e.getMessage());
             return ResponseEntity.badRequest().build();
@@ -37,7 +40,7 @@ public class LocationController {
     @GetMapping
     public ResponseEntity findAllLocations(){
         try{
-            return ResponseEntity.ok(locationservice.findAll());
+            return ResponseEntity.ok(locationService.findAll());
         }catch (Exception e) {
             logger.error("Error finding all locations " + e.getMessage());
             return ResponseEntity.internalServerError().build();
@@ -48,7 +51,7 @@ public class LocationController {
     @DeleteMapping
     public ResponseEntity deleteShip(@RequestParam("locationId") Long shipId){
         try{
-            locationservice.deleteLocation(shipId);
+            locationService.deleteLocation(shipId);
             return ResponseEntity.accepted().build();
         }catch(Exception e){
             logger.error("Error deleting location " + e.getMessage());
@@ -60,7 +63,7 @@ public class LocationController {
     @PostMapping
     public ResponseEntity createLocation(@RequestBody Location location){
         try{
-            return ResponseEntity.created(URI.create("/locations/"+locationservice.createLocation(location).getId())).build();
+            return ResponseEntity.created(URI.create("/locations/"+ locationService.createLocation(location).getId())).build();
         }catch(Exception e){
             logger.error("Error creating location " + e.getMessage());
             return ResponseEntity.internalServerError().build();
@@ -71,7 +74,7 @@ public class LocationController {
     @PatchMapping
     public ResponseEntity updateLocation(@RequestBody Location location){
         try{
-            locationservice.updateLocation(location);
+            locationService.updateLocation(location);
             return ResponseEntity.accepted().build();
         }catch(Exception e){
             logger.error("Error updating location " + e.getMessage());

@@ -4,9 +4,6 @@ import java.util.*;
 
 import jakarta.persistence.EntityNotFoundException;
 import net.aroder.TripTracker.exceptions.UserNotFoundException;
-import net.aroder.TripTracker.models.DTOs.UserDTOs.UserUpdateRequest;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,18 +15,17 @@ import java.util.stream.Collectors;
 
 import net.aroder.TripTracker.models.User;
 import net.aroder.TripTracker.repositories.UserRepository;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * UserService handling any action affecting users.
  */
 @Service
 public class UserService {
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private RestTemplate restTemplate;
+    public UserService(final UserRepository userRepository){
+        this.userRepository = userRepository;
+    }
 
     /**
      * Retrieves the information of a user
@@ -150,9 +146,16 @@ public class UserService {
             throw new IllegalArgumentException("User id does not match");
         }
         User foundUser = userRepository.findById(updatedUser.getId()).orElseThrow(EntityNotFoundException::new);
+        foundUser.setFirstName(updatedUser.getFirstName());
+        foundUser.setSurname(updatedUser.getSurname());
+        foundUser.setEmail(updatedUser.getEmail());
+        foundUser.setRoles(updatedUser.getRoles());
+        foundUser.setOrganizerCompany(updatedUser.getOrganizerCompany());
+        foundUser.setDispatcherCompany(updatedUser.getDispatcherCompany());
+        foundUser.setPhoneNumber(updatedUser.getPhoneNumber());
 
 
-        return userRepository.save(updatedUser);
+        return userRepository.save(foundUser);
     }
 
     public String getCurrentUserType(){

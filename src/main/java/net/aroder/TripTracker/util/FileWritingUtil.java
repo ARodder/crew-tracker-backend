@@ -1,22 +1,14 @@
 package net.aroder.TripTracker.util;
 
-import net.aroder.TripTracker.models.Location;
 import net.aroder.TripTracker.models.PAX;
-import net.aroder.TripTracker.models.Ship;
 import net.aroder.TripTracker.models.Trip;
-import net.aroder.TripTracker.repositories.ShipRepository;
-import net.aroder.TripTracker.services.LocationService;
-import net.aroder.TripTracker.services.PAXService;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -25,8 +17,8 @@ import java.util.stream.Stream;
 
 @Service
 public class FileWritingUtil {
-    private final List<String> firstNameSynonyms = Arrays.asList("firstname", "onsigners", "ofsigners");
-    private Set<String> headerContentSet;
+    private final List<String> firstNameSynonyms = List.of("firstname", "onsigners", "ofsigners");
+    private final Set<String> headerContentSet;
     private final List<String> surNameSynonyms = List.of("surname", "lastname", "onsigners", "ofsigners");
     private final List<String> flightSynonyms = List.of("flight");
     private final List<String> dateSynonyms = List.of("dato", "date");
@@ -50,23 +42,17 @@ public class FileWritingUtil {
     private Integer organizationIndex;
     private Integer remarksIndex;
     private Integer poIndex;
-    private Location harbour;
-    private Ship ship;
-    @Autowired
-    private ShipRepository shipRepository;
-    @Autowired
-    private LocationService locationService;
-    @Autowired
-    private PAXService paxService;
-    @Autowired
-    private ResourceLoader resourceLoader;
+
+    private final ResourceLoader resourceLoader;
 
 
     /**
      * Constructor for FileReadingUtil
      * initializing headerContentSet variable.
      */
-    public FileWritingUtil() {
+    public FileWritingUtil(final ResourceLoader resourceLoader) {
+
+        this.resourceLoader = resourceLoader;
         this.headerContentSet = Stream.of(firstNameSynonyms, surNameSynonyms,
                 flightSynonyms, dateSynonyms, timeSynonyms, pickUpLocationSynonyms,
                 destinationSynonyms, immigrationSynonyms, hotelSynonyms, organizationSynonyms,
@@ -77,8 +63,6 @@ public class FileWritingUtil {
      * Resets all fields specific for each file.
      */
     public void reset() {
-        this.harbour = null;
-        this.ship = null;
         this.firstNameIndex = null;
         this.surNameIndex = null;
         this.flightIndex = null;
@@ -101,7 +85,7 @@ public class FileWritingUtil {
 
         for (Sheet sheet : workbook) {
             sheet.getRow(0).getCell(1).setCellValue(trips.get(0).getShip().getName());
-            int rowIndex = 0;
+            int rowIndex;
             for (rowIndex = 0; rowIndex < sheet.getLastRowNum(); rowIndex++) {
                 if (headerRowFound) {
                     break;
@@ -175,7 +159,7 @@ public class FileWritingUtil {
 
         for (Sheet sheet : workbook) {
             sheet.getRow(0).getCell(1).setCellValue(trips.get(0).getShip().getName());
-            int rowIndex = 0;
+            int rowIndex;
             for (rowIndex = 0; rowIndex < sheet.getLastRowNum(); rowIndex++) {
                 if (headerRowFound) {
                     break;
@@ -236,7 +220,7 @@ public class FileWritingUtil {
 
         for (Sheet sheet : workbook) {
             sheet.getRow(0).getCell(1).setCellValue(trips.get(0).getShip().getName());
-            int rowIndex = 0;
+            int rowIndex;
             for (rowIndex = 0; rowIndex < sheet.getLastRowNum(); rowIndex++) {
                 if (headerRowFound) {
                     break;
@@ -365,7 +349,7 @@ public class FileWritingUtil {
     }
 
     public Double roundLong(Double value, Integer decimalPlaces) {
-        Double roundedValue = Math.pow(10, decimalPlaces) * value;
+        double roundedValue = Math.pow(10, decimalPlaces) * value;
         roundedValue = (double) Math.round(roundedValue);
         roundedValue = roundedValue / Math.pow(10, decimalPlaces);
 
@@ -380,7 +364,7 @@ public class FileWritingUtil {
         boolean headerRowFound = false;
         for (Sheet sheet : workbook) {
             sheet.getRow(0).getCell(1).setCellValue(trips.get(0).getShip().getName());
-            int rowIndex = 0;
+            int rowIndex;
             for (rowIndex = 0; rowIndex < sheet.getLastRowNum(); rowIndex++) {
                 if (headerRowFound) {
                     break;

@@ -3,7 +3,6 @@ package net.aroder.TripTracker.services;
 
 import jakarta.mail.internet.MimeMessage;
 import net.aroder.TripTracker.models.Email;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -18,12 +17,11 @@ import java.util.concurrent.Future;
 
 @Service
 public class EmailSender {
+    private final JavaMailSender javaMailSender;
 
-    @Autowired
-    private JavaMailSender javaMailSender;
-
-    @Autowired
-    private UserService userService;
+    public EmailSender(final JavaMailSender javaMailSender) {
+        this.javaMailSender = javaMailSender;
+    }
 
     /**
      * Sends an email asynchronously from the voicepick sender

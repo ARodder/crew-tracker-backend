@@ -26,7 +26,6 @@ import java.util.List;
  */
 @Mapper(componentModel = "spring")
 public abstract class TripMapper {
-
     @Autowired
     private PaxMapper paxMapper;
     @Autowired
@@ -41,6 +40,8 @@ public abstract class TripMapper {
     private UserMapper userMapper;
     @Autowired
     private TripService tripService;
+
+
 
     /**
      * Converts a Trip entity to a TripDTO.
@@ -74,7 +75,7 @@ public abstract class TripMapper {
     public abstract TripAdminDTO toTripDTOAdmin(Trip trip);
 
     public List<Trip> toTripById(List<Long> tripIds){
-        return tripIds.stream().map(tripId -> tripService.findTripById(tripId)).toList();
+        return tripIds.stream().map(tripService::findTripById).toList();
     }
 
     /**

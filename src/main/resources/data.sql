@@ -26,9 +26,6 @@ INSERT INTO ship (name, imo,organizer_company_id) VALUES ('Freedom of the Seas',
 
 INSERT INTO location(name, longitude, latitude) VALUES ('Storneskaia ålesund',6.1513809, 62.4695037);
 
-INSERT INTO users(id,email,first_name,roles,surname) VALUES('8ae87abd-efc2-4056-8652-36c6322355f1','fylling8@gmail.com','Aleksander', '{ADMIN}','Røder');
-INSERT INTO users(id,email,first_name,roles,surname,organizer_company_id) VALUES('ac0cf45a-e296-4724-8f5e-7c5bacd6dc3a','aroderr00@gmail.com','Aleksander', '{MANAGER}','Røder',1);
-INSERT INTO users(id,email,first_name,roles,surname,dispatcher_company_id) VALUES('97a37f8e-9f6f-47b9-b59a-3027ac9e54b3','alek-fr@hotmail.com','Aleksander', '{DISPATCHER}','Røder',1);
 
 INSERT INTO location(name, longitude, latitude) VALUES ('OSL airport', 11.100361, 60.194067);
 INSERT INTO location(name, longitude, latitude) VALUES ('SVG airport', 5.629167, 58.882778);

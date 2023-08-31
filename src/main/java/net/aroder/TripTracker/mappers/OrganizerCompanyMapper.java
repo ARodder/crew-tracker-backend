@@ -15,15 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")
 public abstract class OrganizerCompanyMapper {
-
     @Autowired
     private OrganizerCompanyService organizerCompanyService;
+
 
     public abstract OrganizerCompanyDTO toOrganizerCompanyDTO(OrganizerCompany organizerCompany);
 
     public abstract List<OrganizerCompanyDTO> toOrganizerCompanyDTO(List<OrganizerCompany> organizerCompanies);
-
-
 
     @Mapping(source = "employees",target="employeeCount",qualifiedByName = "employeesToEmployeeCount")
     @Mapping(source = "ships", target="domainResourceCount", qualifiedByName = "shipsToDomainResourceCount")

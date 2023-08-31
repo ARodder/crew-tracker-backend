@@ -12,6 +12,6 @@ public class UserNotFoundException extends EntityNotFoundException {
      * Constructs a new UserNotFoundException object with a default error message.
      */
     public UserNotFoundException(String s) {
-        super("User not found");
+        super("User not found: " + s);
     }
 }

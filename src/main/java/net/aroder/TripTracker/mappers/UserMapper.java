@@ -24,7 +24,6 @@ import java.util.List;
  */
 @Mapper(componentModel = "spring")
 public abstract class UserMapper {
-
     @Autowired
     private DispatcherCompanyMapper dispatcherCompanyMapper;
     @Autowired
@@ -33,6 +32,8 @@ public abstract class UserMapper {
     private DispatcherCompanyService dispatcherCompanyService;
     @Autowired
     private OrganizerCompanyService organizerCompanyService;
+
+
     /**
      * Converts a User entity to a UserDTO.
      *

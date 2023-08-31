@@ -4,12 +4,10 @@ package net.aroder.TripTracker.util;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.aroder.TripTracker.controllers.AuthController;
 import net.aroder.TripTracker.exceptions.ExcelInformationException;
 import net.aroder.TripTracker.models.Location;
 import net.aroder.TripTracker.models.OrganizerCompany;
@@ -23,7 +21,6 @@ import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.naming.InvalidNameException;
@@ -35,9 +32,9 @@ import javax.naming.InvalidNameException;
 @Service
 public class FileReadingUtil {
 
-    private Logger logger = LoggerFactory.getLogger(FileReadingUtil.class);
-    private final List<String> firstNameSynonyms = Arrays.asList("firstname", "onsigners", "ofsigners");
-    private Set<String> headerContentSet;
+    private final Logger logger = LoggerFactory.getLogger(FileReadingUtil.class);
+    private final List<String> firstNameSynonyms = List.of("firstname", "onsigners", "ofsigners");
+    private final Set<String> headerContentSet;
     private final List<String> surNameSynonyms = List.of("surname", "lastname", "onsigners", "ofsigners");
     private final List<String> flightSynonyms = List.of("flight");
     private final List<String> dateSynonyms = List.of("dato", "date");
@@ -63,19 +60,17 @@ public class FileReadingUtil {
     private Integer poIndex;
     private Location harbour;
     private Ship ship;
-    @Autowired
-    private ShipRepository shipRepository;
-    @Autowired
-    private LocationService locationService;
-    @Autowired
-    private PAXService paxService;
-
-
+    private final ShipRepository shipRepository;
+    private final LocationService locationService;
+    private final PAXService paxService;
     /**
      * Constructor for FileReadingUtil
      * initializing headerContentSet variable.
      */
-    public FileReadingUtil() {
+    public FileReadingUtil(final ShipRepository shipRepository, final LocationService locationService, final PAXService paxService) {
+        this.shipRepository = shipRepository;
+        this.locationService = locationService;
+        this.paxService = paxService;
         this.headerContentSet = Stream.of(firstNameSynonyms, surNameSynonyms,
                 flightSynonyms, dateSynonyms, timeSynonyms, pickUpLocationSynonyms,
                 destinationSynonyms, immigrationSynonyms, hotelSynonyms, organizationSynonyms,
@@ -367,8 +362,8 @@ public class FileReadingUtil {
             }
         }
         if (pax.getStatus().equals("change")) {
-            Boolean checkIfExistByLocation = paxService.checkPassengerByLocationsExist(pax);
-            Boolean checkIfExistByTime = paxService.checkPassengerExistByTime(pax);
+            boolean checkIfExistByLocation = paxService.checkPassengerByLocationsExist(pax);
+            boolean checkIfExistByTime = paxService.checkPassengerExistByTime(pax);
             if (!checkIfExistByLocation && !checkIfExistByTime) {
                 pax.setError("Passenger does not exist");
             }

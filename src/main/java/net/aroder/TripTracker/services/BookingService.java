@@ -3,7 +3,6 @@ package net.aroder.TripTracker.services;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import net.aroder.TripTracker.exceptions.ExcelInformationException;
@@ -16,7 +15,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,19 +32,21 @@ import javax.naming.InvalidNameException;
 @Service
 public class BookingService {
     Logger logger = LoggerFactory.getLogger(BookingService.class);
+    private final FileReadingUtil frUtil;
+    private final FileStorageService fileStorageService;
+    private final UserService userService;
+    private final TripService tripService;
+    private final PAXService paxService;
+    private final OrganizerCompanyService organizerCompanyService;
 
-    @Autowired
-    private FileReadingUtil frUtil;
-    @Autowired
-    private FileStorageService fileStorageService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private TripService tripService;
-    @Autowired
-    private PAXService paxService;
-    @Autowired
-    private OrganizerCompanyService organizerCompanyService;
+    public BookingService(final FileReadingUtil frUtil, final FileStorageService fileStorageService, final UserService userService, final TripService tripService, final PAXService paxService, final OrganizerCompanyService organizerCompanyService) {
+        this.frUtil = frUtil;
+        this.fileStorageService = fileStorageService;
+        this.userService = userService;
+        this.tripService = tripService;
+        this.paxService = paxService;
+        this.organizerCompanyService = organizerCompanyService;
+    }
 
 
     /**
@@ -60,7 +60,7 @@ public class BookingService {
         if (file == null) throw new FileNotFoundException();
         Workbook workbook = new XSSFWorkbook(file.getInputStream());
         List<PAX> newPax = new ArrayList<>();
-        OrganizerCompany organizerCompany = null;
+        OrganizerCompany organizerCompany;
 
         if (userService.userIsAdmin() && companyName != null) {
             organizerCompany = organizerCompanyService.findOrganizerCompanyByName(companyName);
@@ -127,7 +127,7 @@ public class BookingService {
      * @param paxList The list of PAX objects representing the booking orders.
      */
     public void confirmOrder(List<PAX> paxList, String companyName) throws IllegalAccessException {
-        OrganizerCompany foundOrganizerCompany = null;
+        OrganizerCompany foundOrganizerCompany;
         if (userService.userIsAdmin() && companyName != null && !companyName.trim().equals("")) {
             foundOrganizerCompany = organizerCompanyService.findOrganizerCompanyByName(companyName);
         } else if (userService.userIsManagerOrOrganizer() && userService.getCurrentUser().getOrganizerCompany() != null) {

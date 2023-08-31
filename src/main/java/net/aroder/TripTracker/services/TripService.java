@@ -11,16 +11,13 @@ import net.aroder.TripTracker.util.DateUtil;
 import net.aroder.TripTracker.util.FileWritingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
@@ -28,10 +25,7 @@ import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * TripService handles any action applied to a trip, such as
@@ -39,39 +33,41 @@ import java.util.Optional;
  */
 @Service
 public class TripService {
-
     private final Integer PAGE_SIZE = 15;
-    private final String ADMIN_ROLE_KEY = "ROLE_ADMIN";
-    private final String DRIVER_ROLE_KEY = "ROLE_DRIVER";
-    private final String MANAGER_ROLE_KEY = "ROLE_MANAGER";
-    private final String ORGANIZER_ROLE_KEY = "ROLE_ORGANIZER";
-    private final String DISPATCHER_ROLE_KEY = "ROLE_DISPATCHER";
     private final List<String> tripStages = List.of("created", "assigned", "in_progress", "completed", "cancelled");
-
     private static final Logger logger = LoggerFactory.getLogger(TripService.class);
+    private final Double margin;
+    private final RegionRepository regionRepository;
+    private final FileStorageService fileStorageService;
+    private final FileWritingUtil fileWritingUtil;
+    private final TripRepository tripRepository;
+    private final UserService userService;
+    private final LocationService locationService;
+    private final PAXRepository paxRepository;
+    private final ShipRepository shipRepository;
+    private final LocationRepository locationRepository;
 
-    @Value("${margin}")
-    private Double margin;
-    @Autowired
-    private RegionRepository regionRepository;
-    @Autowired
-    private FileStorageService fileStorageService;
-    @Autowired
-    private FileWritingUtil fileWritingUtil;
-    @Autowired
-    private TripRepository tripRepository;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private LocationService locationService;
-    @Autowired
-    private PAXRepository paxRepository;
-    @Autowired
-    private ShipRepository shipRepository;
-    @Autowired
-    private LocationRepository locationRepository;
-    @Autowired
-    private DispatcherCompanyRepository dispatcherCompanyRepository;
+    public TripService(final TripRepository tripRepository,
+                       final UserService userService,
+                       final LocationService locationService,
+                       final PAXRepository paxRepository,
+                       final ShipRepository shipRepository,
+                       final LocationRepository locationRepository,
+                       @Value("${margin}") final Double margin,
+                       final RegionRepository regionRepository,
+                       final FileStorageService fileStorageService,
+                       final FileWritingUtil fileWritingUtil) {
+        this.tripRepository = tripRepository;
+        this.userService = userService;
+        this.locationService = locationService;
+        this.paxRepository = paxRepository;
+        this.shipRepository = shipRepository;
+        this.locationRepository = locationRepository;
+        this.margin = margin;
+        this.regionRepository = regionRepository;
+        this.fileStorageService = fileStorageService;
+        this.fileWritingUtil = fileWritingUtil;
+    }
 
     /**
      * Retrieves a page of trips, filtering trips
@@ -85,6 +81,10 @@ public class TripService {
         User currentUser = userService.getCurrentUser();
         Pageable pageRequest = PageRequest.of(pageNum, PAGE_SIZE);
 
+        String ADMIN_ROLE_KEY = "ROLE_ADMIN";
+        String MANAGER_ROLE_KEY = "ROLE_MANAGER";
+        String ORGANIZER_ROLE_KEY = "ROLE_ORGANIZER";
+        String DISPATCHER_ROLE_KEY = "ROLE_DISPATCHER";
         if (roles.contains(ADMIN_ROLE_KEY)) {
             return tripRepository.findByOrderByPickUpTimeAsc(pageRequest).toList();
         } else if (roles.contains(MANAGER_ROLE_KEY) || roles.contains(ORGANIZER_ROLE_KEY)) {
@@ -105,18 +105,18 @@ public class TripService {
      *
      * @param paxList The list of PAX objects representing the bookings to create trips for.
      */
-    public void createTrips(List<PAX> paxList,OrganizerCompany organizerCompany) {
+    public void createTrips(List<PAX> paxList, OrganizerCompany organizerCompany) {
         paxList = new ArrayList<>(paxList);
-        Integer paxSkipped = 0;
+        int paxSkipped = 0;
         while (paxList.size() > 0) {
             PAX passenger = paxList.get(0);
             paxList.remove(0);
             Trip trip;
             try {
                 trip = this.findOrCreateTrip(passenger, organizerCompany);
-            }catch(Exception e){
+            } catch (Exception e) {
                 paxSkipped++;
-                logger.error("Failed generating trip ",e);
+                logger.error("Failed generating trip ", e);
                 continue;
             }
 
@@ -167,7 +167,6 @@ public class TripService {
                         pax.getPoNumber());
         if (matchingTrip.isPresent()) {
             pax.setTrip(matchingTrip.get());
-            return pax;
         } else {
             Trip newTrip = oldTrip.clone();
             newTrip.setStatus("created");
@@ -178,8 +177,8 @@ public class TripService {
 
             tripRepository.save(newTrip);
             pax.setTrip(newTrip);
-            return pax;
         }
+        return pax;
     }
 
     public List<Trip> searchTrips(SearchObject searchObject, Integer pageNum) throws AccessDeniedException {
@@ -188,16 +187,16 @@ public class TripService {
                 && currentUser.getDispatcherCompany() == null
                 && !userService.userIsAdmin())
             throw new AccessDeniedException("User not allowed to search");
-        Timestamp startDate = null;
-        Timestamp endDate = null;
+        Calendar startDate = null;
+        Calendar endDate = null;
         if (searchObject.getDate() != null) {
-            startDate = (Timestamp) searchObject.getDate().clone();
-            endDate = (Timestamp) searchObject.getDate().clone();
-            startDate.setHours(0);
-            startDate.setMinutes(0);
+            startDate = DateUtil.toCalendar(searchObject.getDate());
+            endDate = DateUtil.toCalendar(searchObject.getDate());
+            startDate.set(Calendar.HOUR_OF_DAY, 0);
+            startDate.set(Calendar.MINUTE, 0);
 
-            endDate.setHours(23);
-            endDate.setMinutes(59);
+            endDate.set(Calendar.HOUR_OF_DAY, 23);
+            endDate.set(Calendar.MINUTE, 59);
         }
         Ship foundShip = shipRepository.findByName(searchObject.getShipName()).orElse(null);
 
@@ -212,9 +211,9 @@ public class TripService {
             searchResult = tripRepository.searchTripsPage(foundShip,
                     searchObject.getPoNumber(),
                     foundLocation,
-                    searchObject.getHideCanceledTrips() != null && searchObject.getHideCanceledTrips() ? searchObject.getHideCanceledTrips() : false,
-                    startDate != null ? startDate : new Timestamp(System.currentTimeMillis()),
-                    endDate,
+                    searchObject.getHideCanceledTrips() != null ? searchObject.getHideCanceledTrips() : false,
+                    startDate != null ? new Timestamp(startDate.getTimeInMillis()) : new Timestamp(System.currentTimeMillis()),
+                    endDate != null ? new Timestamp(endDate.getTimeInMillis()) : null,
                     currentUser.getOrganizerCompany(),
                     dispatcherCompany != null && dispatcherCompany.getRegions().size() > 0 ? dispatcherCompany.getRegions().stream().map(Region::getId).toList() : null,
                     PAGE_SIZE, PAGE_SIZE * pageNum);
@@ -222,9 +221,9 @@ public class TripService {
             searchResult = tripRepository.searchTripsPageArchive(foundShip,
                     searchObject.getPoNumber(),
                     foundLocation,
-                    searchObject.getHideCanceledTrips() != null && searchObject.getHideCanceledTrips() ? searchObject.getHideCanceledTrips() : false,
-                    startDate,
-                    endDate != null ? endDate : new Timestamp(System.currentTimeMillis()),
+                    searchObject.getHideCanceledTrips() != null ? searchObject.getHideCanceledTrips() : false,
+                    startDate != null ? new Timestamp(startDate.getTimeInMillis()) : null,
+                    endDate != null ? new Timestamp(endDate.getTimeInMillis()) : new Timestamp(System.currentTimeMillis()),
                     currentUser.getOrganizerCompany(),
                     dispatcherCompany != null && dispatcherCompany.getRegions().size() > 0 ? dispatcherCompany.getRegions().stream().map(Region::getId).toList() : null,
                     PAGE_SIZE, PAGE_SIZE * pageNum);
@@ -246,7 +245,7 @@ public class TripService {
             passenger.setStatus("canceled");
             paxRepository.save(passenger);
         });
-        Long timeUntilTrip = Duration.between(LocalDateTime.now(),trip.getPickUpTime().toLocalDateTime()).toHours();
+        long timeUntilTrip = Duration.between(LocalDateTime.now(), trip.getPickUpTime().toLocalDateTime()).toHours();
         if (timeUntilTrip < 2) {
             trip.setDriverRemarks("Cancellation fee");
             trip.setCancelFee(true);
@@ -284,7 +283,7 @@ public class TripService {
 
     public Trip createTripFromPax(PAX passenger, OrganizerCompany organizerCompany) {
         Date expirationDate = new Date();
-        expirationDate = DateUtil.addMonths(expirationDate,30);
+        expirationDate = DateUtil.addMonths(expirationDate, 30);
 
         Trip trip = new Trip();
         trip.setStatus("created");
@@ -353,7 +352,7 @@ public class TripService {
         Region foundRegion = regionRepository.findByNameIgnoreCase(searchObject.getRegion()).orElse(null);
         Integer pageSize = 20;
         Integer offset = pageSize * (searchObject.getPageNum() != null && searchObject.getPageNum() != 0 ? searchObject.getPageNum() : 0);
-        if(userService.userIsAdmin()){
+        if (userService.userIsAdmin()) {
             return tripRepository.findDispatcherTripsAdmin(searchObject.getHideAssignedTrips(),
                     searchObject.getHideCanceledTrips(),
                     searchObject.getShowPastTrips(),
@@ -363,7 +362,7 @@ public class TripService {
                     foundRegion != null ? foundRegion.getId() : null,
                     pageSize,
                     offset);
-        }else if (userService.userIsDispatcher()){
+        } else if (userService.userIsDispatcher()) {
             return tripRepository.findDispatcherTrips(currentUser.getDispatcherCompany().getRegions().stream().map(Region::getId).toList(),
                     searchObject.getHideAssignedTrips(),
                     searchObject.getHideCanceledTrips(),
@@ -373,49 +372,53 @@ public class TripService {
                     searchObject.getPoNumber() != null && searchObject.getPoNumber() != 0 ? searchObject.getPoNumber() : null,
                     pageSize,
                     offset);
-        }else throw new AccessDeniedException("Not accessible by user");
+        } else throw new AccessDeniedException("Not accessible by user");
     }
 
-    public void assignDriver(Long tripId,String driverId){
-        Trip trip = tripRepository.findById(tripId).orElseThrow(()-> new EntityNotFoundException("Trip could not be found"));
+    public void assignDriver(Long tripId, String driverId) {
+        Trip trip = tripRepository.findById(tripId).orElseThrow(() -> new EntityNotFoundException("Trip could not be found"));
         User driver = userService.findById(driverId);
         Timestamp twoHoursAgo = Timestamp.valueOf(LocalDateTime.now().minusHours(2));
-        if(trip.getPickUpTime().before(twoHoursAgo)) throw new IllegalArgumentException("can no longer assign a driver to this trip");
+        if (trip.getPickUpTime().before(twoHoursAgo))
+            throw new IllegalArgumentException("can no longer assign a driver to this trip");
 
         //TODO:Add email notification
-        if(userService.userIsAdmin() && driver.getDispatcherCompany().getRegions().contains(trip.getRegion())){
-                trip.setDriver(driver);
-        }else if(userService.userIsDispatcher() && userService.getCurrentUser().getDispatcherCompany().equals(driver.getDispatcherCompany())
-        && userService.getCurrentUser().getDispatcherCompany().getRegions().contains(trip.getRegion())){
+        if (userService.userIsAdmin() && driver.getDispatcherCompany().getRegions().contains(trip.getRegion())) {
             trip.setDriver(driver);
-        }else throw new IllegalArgumentException("You cannot assign this driver to this trip");
-        if(trip.getStatus().equals("created")){
+        } else if (userService.userIsDispatcher() && userService.getCurrentUser().getDispatcherCompany().equals(driver.getDispatcherCompany())
+                && userService.getCurrentUser().getDispatcherCompany().getRegions().contains(trip.getRegion())) {
+            trip.setDriver(driver);
+        } else throw new IllegalArgumentException("You cannot assign this driver to this trip");
+        if (trip.getStatus().equals("created")) {
             trip.setStatus("assigned");
         }
         tripRepository.save(trip);
     }
-    public void assignMultipleDrivers(List<Long> tripIds,String driverId){
-        tripIds.forEach(tripId -> assignDriver(tripId,driverId));
+
+    public void assignMultipleDrivers(List<Long> tripIds, String driverId) {
+        tripIds.forEach(tripId -> assignDriver(tripId, driverId));
     }
 
     public Trip setPrice(Long tripId, Double price) throws IllegalAccessException {
-        Trip foundTrip = tripRepository.findById(tripId).orElseThrow(()-> new EntityNotFoundException("Could not find trip"));
-        if(!userService.userIsAdmin() && !userService.userIsDispatcher()) throw new IllegalAccessException("You cannot access this function");
-        if (!userService.userIsAdmin() && !userService.getCurrentUser().getDispatcherCompany().getRegions().contains(foundTrip.getRegion())) throw new IllegalAccessException("Trip is not in your region");
+        Trip foundTrip = tripRepository.findById(tripId).orElseThrow(() -> new EntityNotFoundException("Could not find trip"));
+        if (!userService.userIsAdmin() && !userService.userIsDispatcher())
+            throw new IllegalAccessException("You cannot access this function");
+        if (!userService.userIsAdmin() && !userService.getCurrentUser().getDispatcherCompany().getRegions().contains(foundTrip.getRegion()))
+            throw new IllegalAccessException("Trip is not in your region");
         foundTrip.setSubContractorPrice(price);
-        if (margin != null){
-            foundTrip.setExternalPrice(price * (1+margin));
-        }else {
+        if (margin != null) {
+            foundTrip.setExternalPrice(price * (1 + margin));
+        } else {
             foundTrip.setExternalPrice(price * 1.05);
         }
         return tripRepository.save(foundTrip);
     }
 
-    public List<Trip> setMultipleTripPrice(List<Long> tripIds, Double price) throws IllegalAccessException {
+    public List<Trip> setMultipleTripPrice(List<Long> tripIds, Double price) {
         List<Trip> trips = new ArrayList<>();
         tripIds.forEach(tripId -> {
             try {
-                trips.add(setPrice(tripId,price));
+                trips.add(setPrice(tripId, price));
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -424,17 +427,20 @@ public class TripService {
     }
 
     public void addDriverRemark(Long tripId, String driverRemark) throws IllegalAccessException {
-        Trip foundTrip = tripRepository.findById(tripId).orElseThrow(()-> new EntityNotFoundException("Could not find trip"));
-        if(!userService.userIsAdmin() && !userService.userIsDispatcher() && !userService.userIsDriver()) throw new IllegalAccessException("You cannot access this function");
-        if (!userService.userIsAdmin() && !userService.getCurrentUser().getDispatcherCompany().getRegions().contains(foundTrip.getRegion())) throw new IllegalAccessException("Trip is not in your region");
+        Trip foundTrip = tripRepository.findById(tripId).orElseThrow(() -> new EntityNotFoundException("Could not find trip"));
+        if (!userService.userIsAdmin() && !userService.userIsDispatcher() && !userService.userIsDriver())
+            throw new IllegalAccessException("You cannot access this function");
+        if (!userService.userIsAdmin() && !userService.getCurrentUser().getDispatcherCompany().getRegions().contains(foundTrip.getRegion()))
+            throw new IllegalAccessException("Trip is not in your region");
         foundTrip.addDriverRemark(driverRemark);
         tripRepository.save(foundTrip);
     }
 
     public Trip setTripStatus(Long tripId, String status) throws IllegalAccessException {
-        Trip foundTrip = tripRepository.findById(tripId).orElseThrow(()->new EntityNotFoundException("Could not find trip"));
-        if(!tripStages.contains(status)) throw new IllegalArgumentException("Status is not valid");
-        if (!userService.userIsAdmin() && !userService.getCurrentUser().getDispatcherCompany().getRegions().contains(foundTrip.getRegion())) throw new IllegalAccessException("Trip is not in your region");
+        Trip foundTrip = tripRepository.findById(tripId).orElseThrow(() -> new EntityNotFoundException("Could not find trip"));
+        if (!tripStages.contains(status)) throw new IllegalArgumentException("Status is not valid");
+        if (!userService.userIsAdmin() && !userService.getCurrentUser().getDispatcherCompany().getRegions().contains(foundTrip.getRegion()))
+            throw new IllegalAccessException("Trip is not in your region");
         foundTrip.setStatus(status);
         return tripRepository.save(foundTrip);
     }
@@ -448,23 +454,23 @@ public class TripService {
         return list;
     }
 
-    public List<Trip> getUnreportedTrips(Integer pageNum,SearchObject searchObject) throws AccessDeniedException {
+    public List<Trip> getUnreportedTrips(Integer pageNum, SearchObject searchObject) throws AccessDeniedException {
         String userType = userService.getCurrentUserType();
         User currentUser = userService.getCurrentUser();
         if (currentUser.getOrganizerCompany() == null
                 && currentUser.getDispatcherCompany() == null
                 && !userService.userIsAdmin())
             throw new AccessDeniedException("User not allowed to search");
-        Timestamp startDate = null;
-        Timestamp endDate = null;
+        Calendar startDate = null;
+        Calendar endDate = null;
         if (searchObject.getDate() != null) {
-            startDate = (Timestamp) searchObject.getDate().clone();
-            endDate = (Timestamp) searchObject.getDate().clone();
-            startDate.setHours(0);
-            startDate.setMinutes(0);
+            startDate = DateUtil.toCalendar(searchObject.getDate());
+            endDate = DateUtil.toCalendar(searchObject.getDate());
+            startDate.set(Calendar.HOUR_OF_DAY, 0);
+            startDate.set(Calendar.MINUTE, 0);
 
-            endDate.setHours(23);
-            endDate.setMinutes(59);
+            endDate.set(Calendar.HOUR_OF_DAY, 23);
+            endDate.set(Calendar.MINUTE, 59);
         }
         Ship foundShip = shipRepository.findByName(searchObject.getShipName()).orElse(null);
         Location foundLocation = locationService.determineLocation(searchObject.getHarbour());
@@ -476,8 +482,8 @@ public class TripService {
                     foundShip,
                     userType,
                     searchObject.getPoNumber(),
-                    startDate != null ? startDate : new Timestamp(System.currentTimeMillis()),
-                    endDate,
+                    startDate != null ? new Timestamp(startDate.getTimeInMillis()) : new Timestamp(System.currentTimeMillis()),
+                    endDate != null ? new Timestamp(endDate.getTimeInMillis()) : null,
                     foundLocation,
                     userService.getCurrentUser().getOrganizerCompany(),
                     dispatcherCompany != null ? dispatcherCompany.getRegions().stream().map(Region::getId).toList() : null,
@@ -488,8 +494,8 @@ public class TripService {
                     foundShip,
                     userType,
                     searchObject.getPoNumber(),
-                    startDate,
-                    endDate != null ? endDate : new Timestamp(System.currentTimeMillis()),
+                    startDate != null ? new Timestamp(startDate.getTimeInMillis()) : null,
+                    endDate != null ? new Timestamp(endDate.getTimeInMillis()) : new Timestamp(System.currentTimeMillis()),
                     foundLocation,
                     userService.getCurrentUser().getOrganizerCompany(),
                     dispatcherCompany != null ? dispatcherCompany.getRegions().stream().map(Region::getId).toList() : null,
@@ -499,15 +505,16 @@ public class TripService {
         return searchResult;
     }
 
-    public List<Trip> getTripsForReport(UnreportedTripSearchObject searchObject){
+    public List<Trip> getTripsForReport(UnreportedTripSearchObject searchObject) {
         Ship foundShip = null;
         Location harbour = null;
+
         if(searchObject.getShip() != null && !searchObject.getShip().trim().isEmpty() && searchObject.getPoNumber() == null && searchObject.getHarbor() != null && !searchObject.getHarbor().trim().isEmpty()){
             foundShip = shipRepository.findByName(searchObject.getShip()).orElseThrow(()->new EntityNotFoundException("Could not find ship"));
             harbour = locationService.determineLocation(searchObject.getHarbor());
         }
-        if(foundShip == null && searchObject.getPoNumber() == null && harbour == null)throw new IllegalArgumentException("You must provide a ship and a harbour or a po number");
-
+        if (foundShip == null && searchObject.getPoNumber() == null && harbour == null)
+            throw new IllegalArgumentException("You must provide a ship and a harbour or a po number");
 
 
         return tripRepository.findUnreportedTripsFiltered(searchObject.getPoNumber(),
@@ -516,21 +523,21 @@ public class TripService {
                 harbour,
                 userService.getCurrentUser().getOrganizerCompany(),
                 userService.getCurrentUser().getDispatcherCompany() != null ? userService.getCurrentUser().getDispatcherCompany().getRegions().stream().map(Region::getId).toList() : null,
-                searchObject.getStartDate(),searchObject.getEndDate());
+                searchObject.getStartDate(), searchObject.getEndDate());
     }
 
 
     public FileDownloadObject generateTripsExport(Long poNumber) throws IOException {
         User currentUser = userService.getCurrentUser();
-        if(currentUser.getOrganizerCompany() == null && currentUser.getDispatcherCompany() == null && !userService.userIsAdmin())throw new AccessDeniedException("User not allowed to get trips");
-        List<Trip> trips = tripRepository.findTripsForExport(poNumber,currentUser.getOrganizerCompany(),currentUser.getDispatcherCompany() != null ? currentUser.getDispatcherCompany().getRegions().stream().map(Region::getId).toList():null);
-        if(trips.isEmpty())throw new EntityNotFoundException("Could not find trips with po number: "+poNumber);
+        if (currentUser.getOrganizerCompany() == null && currentUser.getDispatcherCompany() == null && !userService.userIsAdmin())
+            throw new AccessDeniedException("User not allowed to get trips");
+        List<Trip> trips = tripRepository.findTripsForExport(poNumber, currentUser.getOrganizerCompany(), currentUser.getDispatcherCompany() != null ? currentUser.getDispatcherCompany().getRegions().stream().map(Region::getId).toList() : null);
+        if (trips.isEmpty()) throw new EntityNotFoundException("Could not find trips with po number: " + poNumber);
         FileDownloadObject fdo = new FileDownloadObject();
-        fdo.setFilename("Trips_"+poNumber+".xlsx");
+        fdo.setFilename("Trips_" + poNumber + ".xlsx");
 
 
-
-        File tripsFile = fileStorageService.convertWorkbookToFile(fileWritingUtil.generateTripExport(trips),"Trips_"+poNumber);
+        File tripsFile = fileStorageService.convertWorkbookToFile(fileWritingUtil.generateTripExport(trips), "Trips_" + poNumber);
         Path pathToTripFile = tripsFile.toPath();
         byte[] fileBytes = Files.readAllBytes(pathToTripFile);
         fdo.setByteArrayResource(new ByteArrayResource(fileBytes));
@@ -540,7 +547,7 @@ public class TripService {
     }
 
     public void deleteTrip(Long tripId) throws EntityNotFoundException {
-        Trip foundTrip = tripRepository.findById(tripId).orElseThrow(()->new EntityNotFoundException("Could not find trip"));
+        Trip foundTrip = tripRepository.findById(tripId).orElseThrow(() -> new EntityNotFoundException("Could not find trip"));
         foundTrip.getPassengers().forEach(passenger -> {
             passenger.setTrip(null);
             paxRepository.delete(passenger);

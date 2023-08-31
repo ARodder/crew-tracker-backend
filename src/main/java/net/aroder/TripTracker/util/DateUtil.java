@@ -13,14 +13,14 @@ import java.util.TimeZone;
  *
  * @author BalusC
  * @see CalendarUtil
- * @link http://balusc.omnifaces.org/2007/09/dateutil.html
+ * @link <a href="http://balusc.omnifaces.org/2007/09/dateutil.html">...</a>
  */
 public final class DateUtil {
 
     // Init ---------------------------------------------------------------------------------------
 
-    private static final Map<String, String> DATE_FORMAT_REGEXPS = new HashMap<String, String>() {{
-        put("\\d{2}\\.\\d{2}\\.\\d{4} \\d{1,2}:\\d{2}:\\d{2}","dd.MM.yyyy HH:mm:ss");
+    private static final Map<String, String> DATE_FORMAT_REGEXPS = new HashMap<>() {{
+        put("\\d{2}\\.\\d{2}\\.\\d{4} \\d{1,2}:\\d{2}:\\d{2}", "dd.MM.yyyy HH:mm:ss");
         put("^\\d{8}$", "yyyyMMdd");
         put("^\\d{1,2}-\\d{1,2}-\\d{4}$", "dd-MM-yyyy");
         put("^\\d{4}-\\d{1,2}-\\d{1,2}$", "yyyy-MM-dd");
@@ -242,14 +242,13 @@ public final class DateUtil {
         time = time.toLowerCase();
         if(time.contains("am")){
             time = time.replace("am","");
-            return time;
         }else{
             time = time.replace("pm","");
             String[] timeParts = time.split(":");
             timeParts[0] = (Integer.parseInt(timeParts[0])+12)+"";
             time = String.join(":",timeParts);
-            return time;
         }
+        return time;
     }
 
     /**

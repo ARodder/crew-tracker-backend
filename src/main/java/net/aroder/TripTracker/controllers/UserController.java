@@ -11,10 +11,8 @@ import net.aroder.TripTracker.models.DTOs.UserDTOs.PasswordUpdateRequest;
 import net.aroder.TripTracker.models.DTOs.UserDTOs.UserDTO;
 import net.aroder.TripTracker.models.DTOs.UserDTOs.UserUpdateRequest;
 import net.aroder.TripTracker.services.AuthService;
-import org.mapstruct.factory.Mappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,14 +25,16 @@ import org.springframework.web.client.HttpClientErrorException;
 @RequestMapping(path = "/api/v1/users")
 public class UserController {
 
-    private Logger logger = LoggerFactory.getLogger(UserController.class);
-    @Autowired
-    private UserService userService;
+    private final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private final UserService userService;
+    private final UserMapper userMapper;
+    private final AuthService authService;
 
-    @Autowired
-    private UserMapper userMapper;
-    @Autowired
-    private AuthService authService;
+    public UserController(final UserMapper userMapper, final UserService userService, final AuthService authService) {
+        this.userMapper = userMapper;
+        this.userService = userService;
+        this.authService = authService;
+    }
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")

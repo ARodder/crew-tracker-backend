@@ -5,18 +5,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.servlet.http.HttpServletRequest;
 import net.aroder.TripTracker.mappers.DomainFileMapper;
 import net.aroder.TripTracker.mappers.TripMapper;
 import net.aroder.TripTracker.models.DTOs.DomainFileDTOs.DomainFileDTO;
 import net.aroder.TripTracker.models.DTOs.FileDownloadObject;
 import net.aroder.TripTracker.models.DTOs.TripDTOs.TripDTO;
 import net.aroder.TripTracker.models.DTOs.TripDTOs.TripOrganizeDTO;
-import net.aroder.TripTracker.models.DomainFile;
-import net.aroder.TripTracker.services.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -26,24 +22,21 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import net.aroder.TripTracker.services.ReportService;
 
-import java.io.IOException;
-import java.net.URLConnection;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/reports")
 public class ReportController {
+    private final ReportService reportService;
+    private final DomainFileMapper domainFileMapper;
+    private final Logger logger  = LoggerFactory.getLogger(ReportController.class);
+    private final TripMapper tripMapper;
 
-
-    @Autowired
-    private ReportService reportService;
-    @Autowired
-    private DomainFileMapper domainFileMapper;
-    @Autowired
-    private FileStorageService fileStorageService;
-    private Logger logger  = LoggerFactory.getLogger(ReportController.class);
-    @Autowired
-    private TripMapper tripMapper;
+    public ReportController(final ReportService reportService, final DomainFileMapper domainFileMapper, final TripMapper tripMapper){
+        this.reportService = reportService;
+        this.domainFileMapper = domainFileMapper;
+        this.tripMapper = tripMapper;
+    }
 
 
     @GetMapping
@@ -93,7 +86,7 @@ public class ReportController {
                     @Content(mediaType="application/json", schema=@Schema(implementation= ProblemDetail.class))
             }),
     })
-    public ResponseEntity<Resource> downloadFile(@PathVariable("domainFileId") Long domainFileId, HttpServletRequest request) {
+    public ResponseEntity<Resource> downloadFile(@PathVariable("domainFileId") Long domainFileId) {
 
         try {
             FileDownloadObject fdo = reportService.findResourceRemote(domainFileId);
@@ -103,10 +96,7 @@ public class ReportController {
                     .contentType(MediaType.parseMediaType("application/octet-stream"))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fdo.getFilename() + "\"")
                     .body(fdo.getByteArrayResource());
-        }catch (IOException ex){
-            logger.error("Could not find resource",ex);
-            return ResponseEntity.notFound().build();
-        }catch (Exception e){
+        } catch (Exception e){
             logger.error("Could not download file",e);
             return ResponseEntity.internalServerError().build();
         }

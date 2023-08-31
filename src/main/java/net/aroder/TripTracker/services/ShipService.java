@@ -5,7 +5,6 @@ import net.aroder.TripTracker.models.OrganizerCompany;
 import net.aroder.TripTracker.models.Ship;
 import net.aroder.TripTracker.repositories.OrganizerCompanyRepository;
 import net.aroder.TripTracker.repositories.ShipRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,13 +14,15 @@ import java.util.List;
 
 @Service
 public class ShipService {
+    private final ShipRepository shipRepository;
+    private final UserService userService;
+    private final OrganizerCompanyRepository organizerCompanyRepository;
 
-    @Autowired
-    private ShipRepository shipRepository;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private OrganizerCompanyRepository organizerCompanyRepository;
+    public ShipService(final ShipRepository shipRepository, final UserService userService, final OrganizerCompanyRepository organizerCompanyRepository) {
+        this.shipRepository = shipRepository;
+        this.userService = userService;
+        this.organizerCompanyRepository = organizerCompanyRepository;
+    }
 
 
     /**
