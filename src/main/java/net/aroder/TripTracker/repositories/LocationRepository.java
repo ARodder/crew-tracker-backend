@@ -19,7 +19,7 @@ public interface LocationRepository extends JpaRepository<Location,Long> {
      * @param name the name of the location
      * @return an optional containing the location if found, or empty if not found
      */
-    Optional<Location> findByNameIgnoreCase(String name);
+    List<Location> findByNameIgnoreCase(String name);
 
     /**
      * Retrieves a page of locations with a name 'like' the given parameter.

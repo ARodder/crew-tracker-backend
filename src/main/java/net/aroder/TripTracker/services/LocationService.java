@@ -49,10 +49,11 @@ public class LocationService {
      * @return found location.
      */
     public Location determineLocation(String name) {
+        if(name == null) return null;
         name = name.toLowerCase();
-        Optional<Location> foundLocation = locationRepository.findByNameIgnoreCase(name);
-        if (foundLocation.isPresent()) {
-            Location loc = foundLocation.get();
+        List<Location> foundLocation = locationRepository.findByNameIgnoreCase(name);
+        if (foundLocation.size() > 0) {
+            Location loc = foundLocation.get(0);
             if (loc.getLatitude() != null && loc.getLongitude() != null) {
                 return loc;
             }
