@@ -113,7 +113,7 @@ public class AuthService {
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(map, headers);
 
         var signOutUrl = baseUrl + "/auth/realms/" + realm + "/protocol/openid-connect/logout";
-        var response = restTemplate.postForEntity(signOutUrl, httpEntity, SignOutResponse.class);
+        var response = restTemplate.postForEntity(signOutUrl, httpEntity, SignoutResponse.class);
 
         return response.getStatusCode().is2xxSuccessful();
     }

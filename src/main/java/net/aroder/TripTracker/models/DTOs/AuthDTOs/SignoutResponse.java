@@ -6,6 +6,6 @@ import lombok.Data;
  * A class to manage signOut response. 
  */
 @Data
-public class SignOutResponse {
+public class SignoutResponse {
    private String message;
 }
