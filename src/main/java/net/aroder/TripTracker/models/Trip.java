@@ -39,9 +39,7 @@ public class Trip {
     private Double externalPrice;
     private String passengerRemarks;
     private String driverRemarks;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "region_id")
-    @JsonBackReference
+    @ManyToOne
     private Region region;
     @ManyToOne
     private Ship ship;
@@ -127,6 +125,29 @@ public class Trip {
     }
 
     public Trip clone() {
-        return new Trip(null, null, this.pickUpTime,this.expirationDate, new ArrayList<>(), this.pickUpLocation, this.destination,null, false, this.poNumber, null, null, "", "", this.region, this.ship, "Created", this.organizerCompany, null, null,this.harbour,false,false,false);
+        return new Trip(null,
+                null,
+                this.pickUpTime,
+                this.expirationDate,
+                new ArrayList<>(),
+                this.pickUpLocation,
+                this.destination,
+                null,
+                false,
+                this.poNumber,
+                null,
+                null,
+                "",
+                "",
+                this.region,
+                this.ship,
+                "Created",
+                this.organizerCompany,
+                null,
+                null,
+                this.harbour,
+                false,
+                false,
+                false);
     }
 }

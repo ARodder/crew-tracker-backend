@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ShipService {
@@ -55,6 +56,18 @@ public class ShipService {
         }else throw new AccessDeniedException("You cannot delete this ship");
     }
 
+    public Ship createShip(String shipName,Long organizerCompanyId){
+        Ship ship = new Ship();
+        ship.setName(shipName);
+        if(organizerCompanyId != null && userService.userIsAdmin()){
+            OrganizerCompany foundCompany = organizerCompanyRepository.findById(organizerCompanyId).orElseThrow(EntityNotFoundException::new);
+            ship.setOrganizerCompany(foundCompany);
+        } else if(userService.getCurrentUser().getOrganizerCompany() != null){
+            ship.setOrganizerCompany(userService.getCurrentUser().getOrganizerCompany());
+        }
+        return shipRepository.save(ship);
+    }
+
     public Ship createShip(Ship ship,Long organizerCompanyId){
         if(organizerCompanyId != null && userService.userIsAdmin()){
             OrganizerCompany foundCompany = organizerCompanyRepository.findById(organizerCompanyId).orElseThrow(EntityNotFoundException::new);
@@ -71,5 +84,17 @@ public class ShipService {
             shipRepository.save(ship);
         } else throw new AccessDeniedException("You cannot edit this ship");
 
+    }
+
+    public Ship findShipByName(String shipName,OrganizerCompany organizerCompany){
+        Optional<Ship> foundShip = shipRepository.findByName(shipName);
+        if (foundShip.isPresent()) {
+            return foundShip.get();
+        }else {
+            Ship newShip = new Ship();
+            newShip.setName(shipName);
+            newShip.setOrganizerCompany(organizerCompany);
+            return newShip;
+        }
     }
 }

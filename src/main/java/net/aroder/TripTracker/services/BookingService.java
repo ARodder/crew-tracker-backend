@@ -6,9 +6,13 @@ import java.sql.Timestamp;
 import java.util.*;
 
 import net.aroder.TripTracker.exceptions.ExcelInformationException;
+import net.aroder.TripTracker.models.DTOs.PaxDTOs.ManualOrderPaxDTO;
+import net.aroder.TripTracker.models.DTOs.TripDTOs.ManualTripDTO;
 import net.aroder.TripTracker.models.DTOs.UploadFileResponse;
 import net.aroder.TripTracker.models.DomainFile;
 import net.aroder.TripTracker.models.OrganizerCompany;
+import net.aroder.TripTracker.models.Trip;
+import net.aroder.TripTracker.util.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -191,6 +195,19 @@ public class BookingService {
         }
 
         return completedList;
+    }
+
+    public Trip confirmManualOrder(ManualTripDTO tripOrder){
+        if(!tripOrder.isValid()) throw new IllegalArgumentException("Trip order is not valid");
+        Trip trip = tripService.tripFromManualOrder(tripOrder);
+
+        for(ManualOrderPaxDTO pax : tripOrder.getPassengers()){
+            PAX newPax = paxService.paxFromManualOrder(pax,trip);
+            if(newPax.isImmigration() && (trip.getImmigration() == null || !trip.getImmigration())){
+                trip.setImmigration(true);
+            }
+        }
+        return tripService.saveTrip(trip);
     }
 
 

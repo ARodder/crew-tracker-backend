@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import net.aroder.TripTracker.exceptions.ExcelInformationException;
 import net.aroder.TripTracker.mappers.PaxMapper;
 import net.aroder.TripTracker.models.DTOs.PaxDTOs.PaxDTO;
+import net.aroder.TripTracker.models.DTOs.TripDTOs.ManualTripDTO;
 import net.aroder.TripTracker.models.PAX;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
+import java.net.URI;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 
@@ -95,6 +97,17 @@ public class BookingController {
         try {
             bookingService.confirmOrder((List<PAX>) paxMapper.toPax(paxList),companyName);
             return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            logger.error("ConfirmOrder error"+ e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/order/manual")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ORGANIZER')")
+    public ResponseEntity confirmManualOrder(@RequestBody ManualTripDTO tripOrder){
+        try {
+            return ResponseEntity.created(URI.create("/trips/"+ bookingService.confirmManualOrder(tripOrder).getId())).build();
         } catch (Exception e) {
             logger.error("ConfirmOrder error"+ e.getMessage());
             return ResponseEntity.badRequest().build();

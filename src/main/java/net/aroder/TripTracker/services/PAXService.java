@@ -2,11 +2,14 @@ package net.aroder.TripTracker.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import net.aroder.TripTracker.exceptions.InvalidPassengerException;
+import net.aroder.TripTracker.models.DTOs.PaxDTOs.ManualOrderPaxDTO;
+import net.aroder.TripTracker.models.DTOs.TripDTOs.ManualTripDTO;
 import net.aroder.TripTracker.models.OrganizerCompany;
 import net.aroder.TripTracker.models.PAX;
 import net.aroder.TripTracker.models.Trip;
 import net.aroder.TripTracker.repositories.PAXRepository;
 import net.aroder.TripTracker.repositories.TripRepository;
+import net.aroder.TripTracker.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -219,6 +222,26 @@ public class PAXService {
     }
 
     public PAX savePAX(PAX pax) {
+        return paxRepository.save(pax);
+    }
+
+    public PAX paxFromManualOrder(ManualOrderPaxDTO paxOrder, Trip trip){
+        Date expirationDate = new Date();
+        expirationDate = DateUtil.addMonths(expirationDate, 30);
+        PAX pax = new PAX();
+        pax.setStatus("created");
+        pax.setFirstName(paxOrder.getFirstName());
+        pax.setSurname(paxOrder.getSurname());
+        pax.setPickUpTime(trip.getPickUpTime());
+        pax.setExpirationDate(new Timestamp(expirationDate.getTime()));
+        pax.setPickUpLocation(trip.getPickUpLocation().getName());
+        pax.setDestination(trip.getDestination().getName());
+        pax.setImmigration(paxOrder.isImmigration());
+        pax.setOrganization(paxOrder.getOrganization());
+        pax.setPoNumber(trip.getPoNumber());
+        pax.setHarbour(trip.getHarbour());
+        pax.setShip(trip.getShip());
+        pax.setTrip(trip);
         return paxRepository.save(pax);
     }
 }

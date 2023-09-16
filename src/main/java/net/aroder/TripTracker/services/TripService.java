@@ -5,6 +5,7 @@ import net.aroder.TripTracker.models.*;
 import net.aroder.TripTracker.models.DTOs.DispatchSearchObject;
 import net.aroder.TripTracker.models.DTOs.FileDownloadObject;
 import net.aroder.TripTracker.models.DTOs.SearchObject;
+import net.aroder.TripTracker.models.DTOs.TripDTOs.ManualTripDTO;
 import net.aroder.TripTracker.models.DTOs.UnreportedTripSearchObject;
 import net.aroder.TripTracker.repositories.*;
 import net.aroder.TripTracker.util.DateUtil;
@@ -26,6 +27,7 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * TripService handles any action applied to a trip, such as
@@ -45,28 +47,31 @@ public class TripService {
     private final LocationService locationService;
     private final PAXRepository paxRepository;
     private final ShipRepository shipRepository;
-    private final LocationRepository locationRepository;
+    private final OrganizerCompanyService organizerCompanyService;
+    private final ShipService shipService;
 
     public TripService(final TripRepository tripRepository,
                        final UserService userService,
                        final LocationService locationService,
                        final PAXRepository paxRepository,
                        final ShipRepository shipRepository,
-                       final LocationRepository locationRepository,
                        @Value("${margin}") final Double margin,
                        final RegionRepository regionRepository,
                        final FileStorageService fileStorageService,
-                       final FileWritingUtil fileWritingUtil) {
+                       final FileWritingUtil fileWritingUtil,
+                       final ShipService shipService,
+                       final OrganizerCompanyService organizerCompanyService) {
         this.tripRepository = tripRepository;
         this.userService = userService;
         this.locationService = locationService;
         this.paxRepository = paxRepository;
         this.shipRepository = shipRepository;
-        this.locationRepository = locationRepository;
         this.margin = margin;
         this.regionRepository = regionRepository;
         this.fileStorageService = fileStorageService;
         this.fileWritingUtil = fileWritingUtil;
+        this.shipService = shipService;
+        this.organizerCompanyService = organizerCompanyService;
     }
 
     /**
@@ -200,13 +205,17 @@ public class TripService {
         }
         Ship foundShip = shipRepository.findByName(searchObject.getShipName()).orElse(null);
 
-
         Location foundLocation = locationService.determineLocation(searchObject.getHarbour());
-
 
         List<Trip> searchResult;
         DispatcherCompany dispatcherCompany = currentUser.getDispatcherCompany();
 
+        // List<Long> regionIds = dispatcherCompany != null && dispatcherCompany.getRegions().size() > 0 ? dispatcherCompany.getRegions().stream().map(Region::getId).toList() : null;
+        List<Region> regions = null;
+        if (dispatcherCompany != null && dispatcherCompany.getRegions().size() > 0) {
+            regions = new ArrayList<>(dispatcherCompany.getRegions());
+        }
+        System.out.println("regionIds = " + (regions != null && regions.size() > 0 ? regions.getClass() :""));
         if (searchObject.getArchiveMode() == null || !searchObject.getArchiveMode()) {
             searchResult = tripRepository.searchTripsPage(foundShip,
                     searchObject.getPoNumber(),
@@ -215,7 +224,7 @@ public class TripService {
                     startDate != null ? new Timestamp(startDate.getTimeInMillis()) : new Timestamp(System.currentTimeMillis()),
                     endDate != null ? new Timestamp(endDate.getTimeInMillis()) : null,
                     currentUser.getOrganizerCompany(),
-                    dispatcherCompany != null && dispatcherCompany.getRegions().size() > 0 ? dispatcherCompany.getRegions().stream().map(Region::getId).toList() : null,
+                    regions,
                     PAGE_SIZE, PAGE_SIZE * pageNum);
         } else {
             searchResult = tripRepository.searchTripsPageArchive(foundShip,
@@ -225,12 +234,10 @@ public class TripService {
                     startDate != null ? new Timestamp(startDate.getTimeInMillis()) : null,
                     endDate != null ? new Timestamp(endDate.getTimeInMillis()) : new Timestamp(System.currentTimeMillis()),
                     currentUser.getOrganizerCompany(),
-                    dispatcherCompany != null && dispatcherCompany.getRegions().size() > 0 ? dispatcherCompany.getRegions().stream().map(Region::getId).toList() : null,
+                    regions,
                     PAGE_SIZE, PAGE_SIZE * pageNum);
 
         }
-
-
         return searchResult;
     }
 
@@ -553,5 +560,38 @@ public class TripService {
             paxRepository.delete(passenger);
         });
         tripRepository.delete(foundTrip);
+    }
+
+    public Trip tripFromManualOrder(ManualTripDTO tripOrder){
+        Date expirationDate = new Date();
+        expirationDate = DateUtil.addMonths(expirationDate, 30);
+        OrganizerCompany organizerCompany;
+        if(userService.userIsAdmin()) {
+            organizerCompany = organizerCompanyService.findOrganizerCompanyByName(tripOrder.getOrganizerCompany());
+        }else{
+            organizerCompany = userService.getCurrentUser().getOrganizerCompany();
+        }
+        Ship foundShip = shipService.findShipByName(tripOrder.getShip(), organizerCompany);
+
+
+        Trip trip = new Trip();
+        trip.setPickUpTime(tripOrder.getPickUpTime());
+        trip.setStatus("created");
+        trip.setOrganizerCompany(organizerCompany);
+        trip.setExpirationDate(new Timestamp(expirationDate.getTime()));
+        trip.setPickUpLocation(locationService.determineLocation(tripOrder.getPickUpLocation()));
+        trip.setDestination(locationService.determineLocation(tripOrder.getDestination()));
+        trip.setCancelFee(false);
+        trip.setPoNumber(Long.parseLong(tripOrder.getPoNumber()));
+        trip.setPassengerRemarks(tripOrder.getPassengerRemarks());
+        trip.setHarbour(locationService.determineLocation(tripOrder.getHarbour()));
+        trip.setRegion(locationService.determineRegion(trip.getHarbour()));
+        trip.setShip(foundShip);
+
+        return tripRepository.save(trip);
+    }
+
+    public Trip saveTrip(Trip trip) {
+        return tripRepository.save(trip);
     }
 }

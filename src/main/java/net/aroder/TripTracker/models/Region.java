@@ -18,7 +18,6 @@ import java.util.List;
 @AllArgsConstructor
 @ToString(of = {"id", "name", "regionLocation"})
 public class Region {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,16 +30,7 @@ public class Region {
     @ManyToOne
     @JoinColumn(name = "region_location_id")
     private Location regionLocation;
-
     @OneToMany(mappedBy = "region")
     private List<Trip> trips;
-
-    public Long getId(){
-        return this.id;
-    }
-
-    public void setId(Long id){
-        this.id = id;
-    }
 
 }
