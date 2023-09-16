@@ -82,7 +82,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
             "AND (:harbour is null or t.harbour = :harbour) " +
             "AND ((:hideCanceledTrips  = false) OR (:hideCanceledTrips = true AND t.status != 'canceled')) " +
             "AND (:organizerCompany is null or t.organizerCompany = :organizerCompany) " +
-            "AND (:region is null or t.region.id in :region) " +
+            "AND (:region is null or t.region IN :region) " +
             "AND (cast(:startDate as date) is null or t.pickUpTime > :startDate) " +
             "AND (cast(:endDate as date) is null or t.pickUpTime < :endDate) " +
             "ORDER BY t.pickUpTime " +
@@ -95,7 +95,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
                                @Param("startDate") Timestamp startDate,
                                @Param("endDate") Timestamp endDate,
                                @Param("organizerCompany") OrganizerCompany organizerCompany,
-                               @Param("region") List<Long> region,
+                               @Param("region") List<Region> region,
                                @Param("pageSize") Integer pageSize,
                                @Param("offset") Integer offset
     );
@@ -106,7 +106,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
             "AND (:harbour is null or t.harbour = :harbour) " +
             "AND ((:hideCanceledTrips  = false) OR (:hideCanceledTrips = true AND t.status != 'canceled')) " +
             "AND (:organizerCompany is null or t.organizerCompany = :organizerCompany) " +
-            "AND (:region is null or t.region.id in :region) " +
+            "AND (:region is null or t.region IN :region) " +
             "AND (cast(:startDate as date) is null or t.pickUpTime > :startDate) " +
             "AND (cast(:endDate as date) is null or t.pickUpTime < :endDate) " +
             "ORDER BY t.pickUpTime desc " +
@@ -119,7 +119,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
                                       @Param("startDate") Timestamp startDate,
                                       @Param("endDate") Timestamp endDate,
                                       @Param("organizerCompany") OrganizerCompany organizerCompany,
-                                      @Param("region") List<Long> region,
+                                      @Param("region") List<Region> region,
                                       @Param("pageSize") Integer pageSize,
                                       @Param("offset") Integer offset
     );
