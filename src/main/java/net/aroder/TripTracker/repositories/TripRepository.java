@@ -166,7 +166,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
             "AND ((:hideAssignedTrips = true AND t.driver is null) OR (:hideAssignedTrips = false)) " +
             "AND ((:hideCanceledTrips = true AND t.status != 'canceled') OR (:hideCanceledTrips = false)) " +
             "AND ((:hidePricedTrips = true AND (t.subContractorPrice = null AND t.externalPrice = null)) OR (:hidePricedTrips = false)) " +
-            "AND ((:today is null) OR (:showPastTrips = true AND t.pickUpTime < :today) OR (:showPastTrips = false AND t.pickUpTime > :today)) " +
+            "AND ((cast(:today as date) is null) OR (:showPastTrips = true AND t.pickUpTime < :today) OR (:showPastTrips = false AND t.pickUpTime > :today)) " +
             "AND (:poNumber is null OR t.poNumber = :poNumber) " +
             "ORDER by t.pickUpTime " +
             "LIMIT :pageSize " +
