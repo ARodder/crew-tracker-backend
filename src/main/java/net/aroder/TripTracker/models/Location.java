@@ -18,6 +18,9 @@ public class Location {
     private String name;
     private Double longitude;
     private Double latitude;
+    @ManyToOne
+    private Region region;
+    private String error;
 
     /**
      * Constructs a location with the given name.

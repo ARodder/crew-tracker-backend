@@ -27,7 +27,6 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * TripService handles any action applied to a trip, such as
@@ -215,7 +214,6 @@ public class TripService {
         if (dispatcherCompany != null && dispatcherCompany.getRegions().size() > 0) {
             regions = new ArrayList<>(dispatcherCompany.getRegions());
         }
-        System.out.println("regionIds = " + (regions != null && regions.size() > 0 ? regions.getClass() :""));
         if (searchObject.getArchiveMode() == null || !searchObject.getArchiveMode()) {
             searchResult = tripRepository.searchTripsPage(foundShip,
                     searchObject.getPoNumber(),
@@ -303,9 +301,10 @@ public class TripService {
         trip.setHarbour(passenger.getHarbour());
         trip.setExpirationDate(new Timestamp(expirationDate.getTime()));
         try {
-            trip.setRegion(locationService.determineRegion(passenger.getHarbour()));
+            trip.setRegion(locationService.determineRegion(trip));
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            trip.setError("Could not determine region");
         }
         trip.setImmigration(passenger.isImmigration());
 
@@ -585,7 +584,11 @@ public class TripService {
         trip.setPoNumber(Long.parseLong(tripOrder.getPoNumber()));
         trip.setPassengerRemarks(tripOrder.getPassengerRemarks());
         trip.setHarbour(locationService.determineLocation(tripOrder.getHarbour()));
-        trip.setRegion(locationService.determineRegion(trip.getHarbour()));
+        try{
+        trip.setRegion(locationService.determineRegion(trip));
+        }catch(Exception e){
+            trip.setError("Could not determine region");
+        }
         trip.setShip(foundShip);
 
         return tripRepository.save(trip);

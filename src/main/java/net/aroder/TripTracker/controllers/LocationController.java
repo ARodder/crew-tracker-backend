@@ -1,5 +1,7 @@
 package net.aroder.TripTracker.controllers;
 
+import net.aroder.TripTracker.mappers.LocationMapper;
+import net.aroder.TripTracker.models.DTOs.LocationDTOs.LocationDTO;
 import net.aroder.TripTracker.models.Location;
 import net.aroder.TripTracker.services.LocationService;
 import org.slf4j.Logger;
@@ -17,9 +19,11 @@ public class LocationController {
     private final Logger logger = LoggerFactory.getLogger(LocationController.class);
 
     private final LocationService locationService;
+    private final LocationMapper locationMapper;
 
-    public LocationController(final LocationService locationservice){
+    public LocationController(final LocationService locationservice,final LocationMapper locationMapper){
         this.locationService = locationservice;
+        this.locationMapper = locationMapper;
     }
 
 
@@ -40,7 +44,7 @@ public class LocationController {
     @GetMapping
     public ResponseEntity findAllLocations(){
         try{
-            return ResponseEntity.ok(locationService.findAll());
+            return ResponseEntity.ok(locationMapper.toLocationDTO(locationService.findAll()));
         }catch (Exception e) {
             logger.error("Error finding all locations " + e.getMessage());
             return ResponseEntity.internalServerError().build();
@@ -61,9 +65,9 @@ public class LocationController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER') or hasRole('ROLE_DISPATCHER')")
     @PostMapping
-    public ResponseEntity createLocation(@RequestBody Location location){
+    public ResponseEntity createLocation(@RequestBody LocationDTO location){
         try{
-            return ResponseEntity.created(URI.create("/locations/"+ locationService.createLocation(location).getId())).build();
+            return ResponseEntity.created(URI.create("/locations/"+ locationService.createLocation(locationMapper.toLocation(location)).getId())).build();
         }catch(Exception e){
             logger.error("Error creating location " + e.getMessage());
             return ResponseEntity.internalServerError().build();
@@ -72,9 +76,9 @@ public class LocationController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER') or hasRole('ROLE_DISPATCHER')")
     @PatchMapping
-    public ResponseEntity updateLocation(@RequestBody Location location){
+    public ResponseEntity updateLocation(@RequestBody LocationDTO location){
         try{
-            locationService.updateLocation(location);
+            locationService.updateLocation(locationMapper.toLocation(location));
             return ResponseEntity.accepted().build();
         }catch(Exception e){
             logger.error("Error updating location " + e.getMessage());

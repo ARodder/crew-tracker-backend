@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -53,6 +52,7 @@ public class Trip {
     private Boolean adminReported;
     private Boolean dispatchReported;
     private Boolean organizerReported;
+    private String error;
 
     /**
      * Adds a passenger to the trip.
@@ -148,6 +148,6 @@ public class Trip {
                 this.harbour,
                 false,
                 false,
-                false);
+                false,this.error);
     }
 }
