@@ -1,7 +1,9 @@
 package net.aroder.TripTracker.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import net.aroder.TripTracker.models.Location;
 import net.aroder.TripTracker.models.Region;
+import net.aroder.TripTracker.models.Trip;
 import net.aroder.TripTracker.repositories.LocationRepository;
 import net.aroder.TripTracker.repositories.RegionRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +16,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * The LocationService takes care of any action pertaining to locations, such as modifying,
@@ -79,11 +80,13 @@ public class LocationService {
         HashMap<String, Object> responseLocation;
         if (response.getBody() != null && !response.getBody().isEmpty()  && response.getBody().get(0) != null && response.getBody().get(0) instanceof Map) {
             responseLocation = new HashMap<String, Object>((Map) response.getBody().get(0));
-
-            return locationRepository.save(new Location(name, Double.parseDouble((String) responseLocation.get("lon")), Double.parseDouble((String) responseLocation.get("lat"))));
+            Location newLocation = new Location(name, Double.parseDouble((String) responseLocation.get("lon")), Double.parseDouble((String) responseLocation.get("lat")));
+            newLocation.setRegion(findClosestRegion(newLocation));
+            return locationRepository.save(newLocation);
         }
-
-        return locationRepository.save(new Location(name));
+        Location newLocation = new Location(name);
+        newLocation.setError("Missing region");
+        return locationRepository.save(newLocation);
     }
 
     /**
@@ -113,18 +116,28 @@ public class LocationService {
     /**
      * Determines the closest region for a given location usually a harbour
      *
-     * @param harbour the location to use for the distance search.
+     * @param trip the trip to use for the distance search.
      * @return Returns the Region closest to the parameter
      */
-    public Region determineRegion(Location harbour) {
-        if (harbour.getLongitude() == null || harbour.getLatitude() == null) return null;
-
+    public Region determineRegion(Trip trip) {
+        if(trip == null) return null;
+        if(trip.getPickUpLocation() != null && trip.getPickUpLocation().getLatitude() != null){
+            return trip.getPickUpLocation().getRegion();
+        }else if(trip.getDestination() != null && trip.getDestination().getLatitude() != null){
+            return trip.getDestination().getRegion();
+        }else if(trip.getHarbour() != null && trip.getHarbour().getLatitude() != null){
+            return trip.getHarbour().getRegion();
+        }else {
+            throw new IllegalArgumentException("Trip does not contain a location with coordinates");
+        }
+    }
+    private Region findClosestRegion(Location location){
         List<Region> regions = regionRepository.findAll();
 
         Region closestRegion = null;
         double closestRegionDistance = 0.0;
         for (Region region : regions) {
-            double currentRegionDistance = calculateDirectDistance(region.getRegionLocation(), harbour);
+            double currentRegionDistance = calculateDirectDistance(region.getRegionLocation(), location);
             if (closestRegion == null) {
                 closestRegion = region;
                 closestRegionDistance = currentRegionDistance;
@@ -185,12 +198,18 @@ public class LocationService {
     public Location createLocation(Location location){
         if(location.getName() == null) throw new IllegalArgumentException();
         location.setName(location.getName().trim().toLowerCase());
+        location.setRegion(findClosestRegion(location));
         return locationRepository.save(location);
     }
 
     public void updateLocation(Location location){
         if(location.getName() == null && location.getId() == null) throw new IllegalArgumentException();
+        location.setRegion(findClosestRegion(location));
         locationRepository.save(location);
+    }
+
+    public Location findLocationById(Long id) {
+        return locationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Location not found"));
     }
 
 
