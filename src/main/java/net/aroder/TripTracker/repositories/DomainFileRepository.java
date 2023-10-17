@@ -15,7 +15,7 @@ import java.util.List;
 @Repository
 public interface DomainFileRepository extends JpaRepository<DomainFile, Long> {
 
-    Page<DomainFile> findAllByType(String type, Pageable pageable);
+    Page<DomainFile> findAllByTypeOrderByCreatedAtDesc(String type, Pageable pageable);
 
     @Query("SELECT df FROM DomainFile df " +
             "WHERE df.type = :type " +

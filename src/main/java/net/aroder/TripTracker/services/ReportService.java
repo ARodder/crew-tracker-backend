@@ -51,7 +51,7 @@ public class ReportService {
         PageRequest pageRequest = PageRequest.of(pageNum, PAGE_SIZE);
 
         if(userService.userIsAdmin()){
-            return domainFileRepository.findAllByType("report", pageRequest).toList();
+            return domainFileRepository.findAllByTypeOrderByCreatedAtDesc("report", pageRequest).toList();
         }else if(userService.userIsManagerOrOrganizer()){
             return domainFileRepository.findPageForOrganizerCompany("report", userService.getCurrentUser().getOrganizerCompany(), PAGE_SIZE, PAGE_SIZE *pageNum);
         }else if(userService.userIsDispatcher()){
