@@ -176,6 +176,7 @@ public class PAXService {
         oldPax.setDestination(newPax.getDestination());
         oldPax.setPickUpLocation(newPax.getPickUpLocation());
         oldPax = tripService.determineNewTrip(oldTrip, oldPax);
+
         paxRepository.save(oldPax);
     }
 

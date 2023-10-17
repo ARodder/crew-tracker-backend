@@ -170,7 +170,13 @@ public class TripService {
                         locationService.determineLocation(pax.getPickUpLocation()),
                         pax.getPoNumber());
         if (matchingTrip.isPresent()) {
-            pax.setTrip(matchingTrip.get());
+            Trip newTrip = matchingTrip.get();
+            if(pax.isImmigration()){
+                newTrip.setImmigration(true);
+                tripRepository.save(newTrip);
+            }
+            pax.setTrip(newTrip);
+
         } else {
             Trip newTrip = oldTrip.clone();
             newTrip.setStatus("created");
@@ -178,6 +184,7 @@ public class TripService {
             newTrip.setPickUpLocation(locationService.determineLocation(pax.getPickUpLocation()));
             newTrip.setPickUpTime(pax.getPickUpTime());
             newTrip.addPassengerRemark(pax.getRemarks());
+            newTrip.immigrationCheck();
 
             tripRepository.save(newTrip);
             pax.setTrip(newTrip);

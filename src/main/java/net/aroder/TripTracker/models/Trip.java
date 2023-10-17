@@ -124,6 +124,17 @@ public class Trip {
         }
     }
 
+    public void immigrationCheck(){
+        for(PAX pax: passengers){
+            if(pax.isImmigration()){
+                this.immigration = true;
+                break;
+            }else {
+                this.immigration = false;
+            }
+        }
+    }
+
     public Trip clone() {
         return new Trip(null,
                 null,
