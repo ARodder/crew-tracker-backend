@@ -1,6 +1,7 @@
 package net.aroder.TripTracker.mappers;
 
 import net.aroder.TripTracker.models.*;
+import net.aroder.TripTracker.models.DTOs.LocationDTOs.LocationDTO;
 import net.aroder.TripTracker.models.DTOs.PaxDTOs.PaxDTO;
 import net.aroder.TripTracker.models.DTOs.ShipDTOs.ShipDTO;
 import net.aroder.TripTracker.models.DTOs.TripDTOs.TripAdminDTO;
@@ -40,6 +41,8 @@ public abstract class TripMapper {
     private UserMapper userMapper;
     @Autowired
     private TripService tripService;
+    @Autowired
+    private LocationMapper locationMapper;
 
 
 
@@ -55,6 +58,8 @@ public abstract class TripMapper {
     @Mapping(source = "organizerCompany",target="organizerCompanyId",qualifiedByName = "organizerCompanyToOrganizerCompanyId")
     @Mapping(source = "ship",target="ship",qualifiedByName = "shipToShipDto")
     @Mapping(source = "subContractorPrice",target="price")
+    @Mapping(source = "pickUpLocation", target = "pickUpLocation", qualifiedByName = "locationToLocationDto")
+    @Mapping(source = "destination", target = "destination", qualifiedByName = "locationToLocationDto")
     public abstract TripDispatchDTO toTripDTODispatch(Trip trip);
 
     @Mapping(source = "driver",target="driver",qualifiedByName = "driverToDriverDto")
@@ -63,6 +68,8 @@ public abstract class TripMapper {
     @Mapping(source = "organizerCompany",target="organizerCompanyId",qualifiedByName = "organizerCompanyToOrganizerCompanyId")
     @Mapping(source = "ship",target="ship",qualifiedByName = "shipToShipDto")
     @Mapping(source = "externalPrice",target="price")
+    @Mapping(source = "pickUpLocation", target = "pickUpLocation", qualifiedByName = "locationToLocationDto")
+    @Mapping(source = "destination", target = "destination", qualifiedByName = "locationToLocationDto")
     public abstract TripOrganizeDTO toTripDTOOrganize(Trip trip);
 
     @Mapping(source = "driver",target="driver",qualifiedByName = "driverToDriverDto")
@@ -72,6 +79,8 @@ public abstract class TripMapper {
     @Mapping(source = "ship",target="ship",qualifiedByName = "shipToShipDto")
     @Mapping(source = "externalPrice",target="externalPrice")
     @Mapping(source = "subContractorPrice",target="subContractorPrice")
+    @Mapping(source = "pickUpLocation", target = "pickUpLocation", qualifiedByName = "locationToLocationDto")
+    @Mapping(source = "destination", target = "destination", qualifiedByName = "locationToLocationDto")
     public abstract TripAdminDTO toTripDTOAdmin(Trip trip);
 
     public List<Trip> toTripById(List<Long> tripIds){
@@ -89,6 +98,8 @@ public abstract class TripMapper {
     @Mapping(source = "regionId",target="region",qualifiedByName = "regionIdToRegion")
     @Mapping(source = "organizerCompanyId",target="organizerCompany",qualifiedByName = "organizerCompanyIdToOrganizerCompany")
     @Mapping(source = "ship",target="ship",qualifiedByName = "shipDtoToShip")
+    @Mapping(source = "pickUpLocation", target = "pickUpLocation", qualifiedByName = "locationDtoToLocation")
+    @Mapping(source = "destination", target = "destination", qualifiedByName = "locationDtoToLocation")
     public abstract Trip toTrip(TripDTO trip);
 
     public abstract Collection<Trip> toTrip(List<TripDTO> trip);
@@ -174,6 +185,16 @@ public abstract class TripMapper {
     @Named("organizerCompanyToOrganizerCompanyId")
     public Long organizerCompanyToOrganizerCompanyId(OrganizerCompany company){
         return company != null ? company.getId() : null;
+    }
+
+    @Named("locationToLocationDto")
+    public LocationDTO locationToLocationDto(Location location){
+        return location != null ? locationMapper.toLocationDTO(location) : null;
+    }
+
+    @Named("locationDtoToLocation")
+    public Location locationToLocationDto(LocationDTO location){
+        return location != null ? locationMapper.toLocationById(location.getId()) : null;
     }
 
 }
